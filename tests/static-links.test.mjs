@@ -82,7 +82,11 @@ test("mobile header keeps the account entry point visible", async () => {
   assert.doesNotMatch(css, /\.icon-utilities a:nth-child\(2\)[^{]*\{ display: none; \}/);
 });
 
-test("Google sign-in uses the FedCM button flow on static hosting", async () => {
-  const source = await readFile(resolve("app/components/GoogleSignInButton.tsx"), "utf8");
-  assert.match(source, /use_fedcm_for_button:\s*true/);
+test("Google sign-in uses Firebase popup auth on static hosting", async () => {
+  const provider = await readFile(resolve("app/components/AuthProvider.tsx"), "utf8");
+  const firebase = await readFile(resolve("app/lib/firebase.ts"), "utf8");
+  const button = await readFile(resolve("app/components/GoogleSignInButton.tsx"), "utf8");
+  assert.match(provider, /signInWithPopup\(firebaseAuth, provider, browserPopupRedirectResolver\)/);
+  assert.match(firebase, /popupRedirectResolver:\s*browserPopupRedirectResolver/);
+  assert.doesNotMatch(button, /use_fedcm_for_button/);
 });

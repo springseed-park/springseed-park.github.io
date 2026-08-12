@@ -752,11 +752,11 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .auth-mode-tabs button { padding: 0 0 17px; border: 0; border-bottom: 2px solid transparent; color: #8b847d; background: transparent; cursor: pointer; font-size: 14px; }
 .auth-mode-tabs button.active { border-bottom-color: var(--ink); color: var(--ink); }
 .google-signin-shell { position: relative; width: 100%; }
-.google-signin-frame { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; }
-.google-signin-frame > div,
-.google-signin-frame iframe { max-width: 100% !important; }
-.google-signin-loading { min-height: 44px; margin-top: -44px; display: grid; place-items: center; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 13px; }
-.google-signin-busy { position: absolute; inset: 0 0 auto; z-index: 2; min-height: 44px; display: grid; place-items: center; background: rgba(255, 255, 255, .92); color: var(--ink); font-size: 13px; }
+.google-signin-button { width: 100%; min-height: 46px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 12px; border: 1px solid #b7b7b7; background: #fff; color: #1f1f1f; font: 500 14px/1.2 Arial, sans-serif; cursor: pointer; transition: background .2s, border-color .2s, box-shadow .2s; }
+.google-signin-button:hover { border-color: #8a8a8a; background: #f8faff; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.google-signin-button:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px; }
+.google-signin-button:disabled { cursor: wait; color: var(--muted); background: #f6f6f6; }
+.google-signin-button svg { width: 20px; height: 20px; flex: 0 0 auto; }
 .google-signin-caption { margin: 9px 0 0; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .google-signin-shell .form-message { margin-top: 10px; }
 .auth-divider { display: flex; align-items: center; gap: 14px; margin: 25px 0; color: #8d867e; font-size: 13px; white-space: nowrap; }

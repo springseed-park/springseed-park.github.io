@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
   browserLocalPersistence,
+  browserPopupRedirectResolver,
   browserSessionPersistence,
   getAuth,
   indexedDBLocalPersistence,
@@ -24,7 +25,7 @@ export const firebaseAuth = (() => {
   try {
     return initializeAuth(firebaseApp, {
       persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence],
-      popupRedirectResolver: undefined,
+      popupRedirectResolver: browserPopupRedirectResolver,
     });
   } catch (error) {
     // During hot reload the Firebase app can outlive this module. Reuse its
@@ -36,8 +37,3 @@ export const firebaseAuth = (() => {
   }
 })();
 export const firestore = getFirestore(firebaseApp);
-
-// Public OAuth client ID created for this Firebase web app. Google Identity
-// Services returns an ID token directly to Firebase, so local sign-in does not
-// depend on a cross-site redirect helper.
-export const googleOAuthClientId = "980797869662-4k28h5g4bqnv8f9d413619hjk5vdq92t.apps.googleusercontent.com";
