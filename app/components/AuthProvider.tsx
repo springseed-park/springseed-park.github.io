@@ -188,7 +188,7 @@ export function firebaseErrorMessage(error: unknown) {
     "auth/requires-recent-login": "보안을 위해 로그아웃 후 다시 로그인해 주세요.",
     "auth/wrong-password": "현재 비밀번호가 올바르지 않습니다.",
     "auth/operation-not-allowed": "현재 로그인 방식이 활성화되지 않았습니다. 관리자에게 문의해 주세요.",
-    "auth/network-request-failed": "네트워크 연결을 확인한 후 다시 시도해 주세요.",
+    "auth/network-request-failed": "Google 로그인에 연결하지 못했습니다. 앱 내 브라우저라면 Chrome 또는 Safari에서 열거나 이메일 로그인을 이용해 주세요.",
     "auth/operation-not-supported-in-this-environment": "앱 내 브라우저에서는 Google 로그인이 제한될 수 있습니다. Chrome 또는 Safari에서 열거나 이메일 로그인을 이용해 주세요.",
     "auth/web-storage-unsupported": "브라우저의 쿠키 및 사이트 데이터 사용을 허용해 주세요.",
     "auth/unauthorized-domain": "현재 접속 주소가 Google 로그인에 허용되지 않았습니다.",
