@@ -86,6 +86,7 @@ export type MemberOrder = {
   items: OrderItem[];
   itemShipments?: ItemShipment[];
   payment?: PaymentInfo;
+  shippingAddress?: MemberAddress;
 };
 
 export type PaymentInfo = {
@@ -286,6 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           items: data.items ?? [],
           itemShipments,
           payment: data.payment ?? managed?.payment,
+          shippingAddress: data.shippingAddress,
         };
         }));
       };

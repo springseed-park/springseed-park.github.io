@@ -147,4 +147,6 @@ test("admin orders synchronize across tabs and completed orders retain a recover
   assert.match(success, /syncAdminCache\(pending, payment\)/);
   assert.match(success, /order: pending/);
   assert.match(success, /readCompletedOrder\(orderId\)/);
+  assert.match(admin, /auth\.orders\.filter/);
+  assert.match(admin, /order\.shippingAddress/);
 });

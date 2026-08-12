@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from "react";
 import { formatPrice, Product, products } from "../lib/products";
+import { type PaymentInfo, useAuth } from "../components/AuthProvider";
 
 type AdminTab = "dashboard" | "products" | "orders" | "inquiries" | "members";
 type ProductStatus = "판매중" | "품절" | "판매중지";
@@ -31,7 +32,7 @@ type InquiryStatus = "등록" | "처리중" | "처리완료";
 type OrderStatus = "결제완료" | "출고준비" | "출고완료" | "배송중" | "배송완료" | "취소" | "환불완료";
 type AdminProduct = Product & { sku: string; stock: number; status: ProductStatus; updatedAt: string };
 type OrderItem = { id: string; name: string; image: string; color: string; size: string; quantity: number; price: number; status?: OrderStatus; courier?: string; trackingNumber?: string; estimatedDelivery?: string };
-type Order = { id: string; customer: string; email: string; phone: string; address: string; items: OrderItem[]; amount: number; date: string; status: OrderStatus; courier: string; trackingNumber: string; memo: string };
+type Order = { id: string; customer: string; email: string; phone: string; address: string; items: OrderItem[]; amount: number; date: string; status: OrderStatus; courier: string; trackingNumber: string; memo: string; payment?: PaymentInfo };
 type Inquiry = { id: number; product: string; category: string; title: string; body: string; customer: string; date: string; status: InquiryStatus; answer: string; sourceKey?: string; sourceQuestionId?: string };
 type Member = { id: string; name: string; email: string; phone: string; joinedAt: string; lastLogin: string; orderCount: number; totalSpent: number; status: "정상" | "휴면" | "차단"; address: string; memo: string };
 
@@ -96,6 +97,7 @@ function usePersistentState<T>(key: string, initial: T, mergeSaved?: (saved: T) 
 }
 
 export default function AdminPage() {
+  const auth = useAuth();
   const [tab, setTab] = useState<AdminTab>("dashboard");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("전체");
@@ -107,6 +109,28 @@ export default function AdminPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [openInquiry, setOpenInquiry] = useState<number | null>(null);
+  useEffect(() => {
+    if (!auth.user || auth.orders.length === 0) return;
+    setOrders((current) => {
+      const currentIds = new Set(current.map((order) => order.id));
+      const missingOrders: Order[] = auth.orders.filter((order) => !currentIds.has(order.orderNumber)).map((order) => ({
+        id: order.orderNumber,
+        customer: order.shippingAddress?.recipient || auth.profile?.displayName || "회원 고객",
+        email: auth.user?.email || auth.profile?.email || "",
+        phone: order.shippingAddress?.phone || auth.profile?.phone || "",
+        address: order.shippingAddress ? `[${order.shippingAddress.postalCode}] ${order.shippingAddress.addressLine1} ${order.shippingAddress.addressLine2}`.trim() : "회원 배송지",
+        items: order.items.map((product, index) => ({ ...product, status: order.itemShipments?.[index]?.status as OrderStatus | undefined, courier: order.itemShipments?.[index]?.courier, trackingNumber: order.itemShipments?.[index]?.trackingNumber, estimatedDelivery: order.itemShipments?.[index]?.estimatedDelivery })),
+        amount: order.total,
+        date: order.createdAt?.toLocaleString("ko-KR") || "방금 전",
+        status: "결제완료",
+        courier: order.courier || "배송 준비 중",
+        trackingNumber: order.trackingNumber || "",
+        memo: "",
+        payment: order.payment,
+      }));
+      return missingOrders.length ? [...missingOrders, ...current] : current;
+    });
+  }, [auth.orders, auth.profile, auth.user, setOrders]);
   const pendingInquiries = inquiries.filter((item) => item.status !== "처리완료").length;
   const filteredProducts = useMemo(() => catalog.filter((product) => (category === "전체" || product.category === category) && `${product.name} ${product.category} ${product.sku}`.toLowerCase().includes(query.toLowerCase())), [catalog, category, query]);
   const revenue = orders.filter((order) => order.status !== "취소" && order.status !== "환불완료").reduce((sum, order) => sum + order.amount, 0);
