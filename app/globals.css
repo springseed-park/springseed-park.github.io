@@ -744,12 +744,7 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .account-loading span { width: 34px; height: 34px; border: 1px solid var(--line); border-top-color: var(--ink); border-radius: 50%; animation: account-spin .8s linear infinite; }
 @keyframes account-spin { to { transform: rotate(360deg); } }
 .account-heading { background: #f4f1eb; }
-.account-auth-layout { align-items: start; }
-.auth-intro { position: sticky; top: 120px; }
-.auth-intro > p:last-of-type { max-width: 520px; line-height: 1.9; }
-.auth-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 50px; background: var(--line); border: 1px solid var(--line); }
-.auth-benefits span { min-height: 115px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; padding: 19px; background: var(--ivory); font-size: 13px; }
-.auth-benefits svg { width: 22px; height: 22px; stroke-width: 1.2; }
+.account-auth-layout { display: block; width: min(100%, 620px); margin-inline: auto; padding: 85px 20px 145px; }
 .auth-panel { padding: 34px; border: 1px solid var(--line); background: rgba(255,255,255,.35); }
 .auth-panel form { gap: 20px; }
 .auth-mode-tabs { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 27px; border-bottom: 1px solid var(--line); }
@@ -1456,9 +1451,8 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
   .postcode-backdrop { padding: 10px; }
   .postcode-dialog { max-height: calc(100svh - 20px); padding: 18px; }
   .account-heading > span { position: static; display: block; max-width: 100%; margin-top: 24px; overflow: hidden; text-overflow: ellipsis; }
-  .auth-intro { position: static; }
-  .auth-benefits { margin-top: 35px; }
-  .auth-panel { margin-top: 50px; padding: 24px 18px; }
+  .account-auth-layout { padding: 60px 20px 95px; }
+  .auth-panel { margin-top: 0; padding: 24px 18px; }
   .auth-panel form { margin-top: 0; }
   .mypage-shell { display: block; padding: 35px 16px 95px; }
   .mypage-nav { position: static; margin-bottom: 50px; }
@@ -1492,8 +1486,6 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
   .address-label-field button { min-width: 0; }
   .address-editor-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .address-editor-actions .secondary-button, .address-editor-actions .primary-button { min-width: 0; width: 100%; }
-  .auth-benefits { grid-template-columns: 1fr; }
-  .auth-benefits span { min-height: 80px; flex-direction: row; align-items: center; }
   .dashboard { padding: 45px 16px 95px; }
   .dashboard-welcome { padding: 34px 24px; }
   .dashboard-welcome h2 { font-size: 37px; }

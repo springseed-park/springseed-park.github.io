@@ -95,3 +95,15 @@ test("Toss redirect result pages are included in the static Pages build", async 
   assert.equal(await exists(await resolveOutputFile("/payment/success")), true);
   assert.equal(await exists(await resolveOutputFile("/payment/fail")), true);
 });
+
+test("GitHub Pages build points Toss requests at the approval server", async () => {
+  const workflow = await readFile(resolve(".github/workflows/deploy-pages.yml"), "utf8");
+  assert.match(workflow, /NEXT_PUBLIC_TOSS_API_ORIGIN:\s*https:\/\/maison-elan-seoul\.springseed\.chatgpt\.site/);
+});
+
+test("account sign-in keeps only the centered authentication panel", async () => {
+  const account = await readFile(resolve("app/account/page.tsx"), "utf8");
+  const css = await readFile(resolve("app/globals.css"), "utf8");
+  assert.doesNotMatch(account, /className="auth-intro"/);
+  assert.match(css, /\.account-auth-layout \{ display: block; width: min\(100%, 620px\); margin-inline: auto;/);
+});

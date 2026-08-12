@@ -85,7 +85,6 @@ export default function AccountPage() {
     <main id="content" className="inner-page utility-page account-page">
       <div className="utility-heading account-heading"><p className="eyebrow dark">MEMBERSHIP</p><h1>Account</h1><span>SECURE MEMBER AREA</span></div>
       <section className="login-layout account-auth-layout">
-        <div className="auth-intro"><p className="eyebrow dark">{mode === "login" ? "SIGN IN" : "JOIN US"}</p><h2>{mode === "login" ? "다시 만나 반가워요." : "엘란의 멤버가 되어보세요."}</h2><p>주문 조회, 배송 확인, 위시리스트와 회원 전용 서비스를 한 곳에서 편리하게 이용하세요.</p><div className="auth-benefits"><span><PackageCheck />주문·배송 조회</span><span><MapPin />배송지 관리</span><span><TicketPercent />가입 즉시 10% 쿠폰</span></div></div>
         <div className="auth-panel">
           <div className="auth-mode-tabs"><button className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setError(""); }} type="button">로그인</button><button className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }} type="button">회원가입</button></div>
           <GoogleSignInButton />
