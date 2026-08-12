@@ -81,6 +81,17 @@ function usePersistentState<T>(key: string, initial: T, mergeSaved?: (saved: T) 
     return () => window.cancelAnimationFrame(frame);
   }, [key, mergeSaved]);
   useEffect(() => { if (ready) { localStorage.setItem(key, JSON.stringify(value)); window.dispatchEvent(new CustomEvent("maison-storage-updated", { detail: { key } })); } }, [key, ready, value]);
+  useEffect(() => {
+    const syncFromAnotherTab = (event: StorageEvent) => {
+      if (event.key !== key || !event.newValue) return;
+      try {
+        const parsed = JSON.parse(event.newValue) as T;
+        setValue(mergeSaved ? mergeSaved(parsed) : parsed);
+      } catch { /* keep the current admin data when another tab writes malformed data */ }
+    };
+    window.addEventListener("storage", syncFromAnotherTab);
+    return () => window.removeEventListener("storage", syncFromAnotherTab);
+  }, [key, mergeSaved]);
   return [value, setValue];
 }
 

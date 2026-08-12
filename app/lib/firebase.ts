@@ -4,7 +4,6 @@ import {
   browserPopupRedirectResolver,
   browserSessionPersistence,
   getAuth,
-  indexedDBLocalPersistence,
   initializeAuth,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -24,7 +23,7 @@ export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseC
 export const firebaseAuth = (() => {
   try {
     return initializeAuth(firebaseApp, {
-      persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence],
+      persistence: [browserLocalPersistence, browserSessionPersistence],
       popupRedirectResolver: browserPopupRedirectResolver,
     });
   } catch (error) {

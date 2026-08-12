@@ -214,7 +214,7 @@ export default function CheckoutPage() {
           <fieldset><legend><span>02</span>배송지 정보</legend><div className="form-grid"><label>받는 분<input name="recipient" required defaultValue={auth.profile?.address.recipient || auth.profile?.displayName} placeholder="받는 분 이름" /></label><label>받는 분 연락처<input name="recipientPhone" required type="tel" defaultValue={auth.profile?.address.phone || auth.profile?.phone} placeholder="010-0000-0000" /></label><PostcodeFields initial={auth.profile?.address} detailRequired /><label className="full">배송 요청사항<select name="deliveryMemo" defaultValue=""><option value="" disabled>요청사항을 선택해 주세요</option><option>문 앞에 놓아주세요</option><option>배송 전 연락해 주세요</option><option>경비실에 맡겨주세요</option></select></label></div></fieldset>
           <fieldset>
             <legend><span>03</span>결제 수단</legend>
-            <div className="payment-method-notice"><ShieldCheck size={18} /> 토스페이먼츠 테스트 모드입니다. 실제 금액은 청구되지 않습니다.</div>
+            <div className="payment-method-notice"><ShieldCheck size={18} /> 결제 정보는 토스페이먼츠 보안 결제창에서 안전하게 처리됩니다.</div>
             {widgetLoading && <div className="payment-method-notice">안전한 결제 수단을 불러오는 중입니다.</div>}
             {widgetError && <div className="payment-method-notice" role="alert">{widgetError} <button type="button" onClick={retryWidget}>다시 불러오기</button></div>}
             <div id="payment-method" aria-label="결제 수단 선택" />

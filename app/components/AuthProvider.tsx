@@ -152,6 +152,7 @@ type AuthContextValue = {
 
 const emptyAddress: MemberAddress = { recipient: "", phone: "", postalCode: "", addressLine1: "", addressLine2: "" };
 const AuthContext = createContext<AuthContextValue | null>(null);
+const googleProvider = new GoogleAuthProvider();
 
 function profileFromUser(user: User): MemberProfile {
   return { displayName: user.displayName ?? "엘란 고객", email: user.email ?? "", phone: "", address: emptyAddress, addresses: [], coupons: [] };
@@ -231,6 +232,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const fallback = profileFromUser(nextUser);
+    setProfile(fallback);
+    setLoading(false);
     try {
       const userRef = doc(firestore, "users", nextUser.uid);
       const snapshot = await getDoc(userRef);
@@ -246,8 +249,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       syncLocalAdminMember(nextUser, resolvedProfile);
     } catch {
       setProfile(fallback);
-    } finally {
-      setLoading(false);
     }
   }), []);
 
@@ -320,10 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   const signInWithGoogle = async () => {
     setAuthError("");
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
-    await signInWithPopup(firebaseAuth, provider, browserPopupRedirectResolver);
-    await setPersistence(firebaseAuth, browserLocalPersistence);
+    await signInWithPopup(firebaseAuth, googleProvider, browserPopupRedirectResolver);
   };
   const resetPassword = async (email: string) => { await sendPasswordResetEmail(firebaseAuth, email); };
   const logout = async () => { await signOut(firebaseAuth); };

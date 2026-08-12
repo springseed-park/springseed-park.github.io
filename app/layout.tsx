@@ -25,13 +25,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="preconnect" href="https://accounts.google.com" />
         <link rel="preconnect" href="https://accounts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://maison-elan-shop.firebaseapp.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googleapis.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://accounts.gstatic.com" />
         <link rel="preconnect" href="https://t1.kakaocdn.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://t1.kakaocdn.net" />
         <link rel="preconnect" href="https://dapi.kakao.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://dapi.kakao.com" />
-        <script id="google-identity-services" src="https://accounts.google.com/gsi/client" async fetchPriority="high" />
       </head>
       <body>
         <StoreProvider>

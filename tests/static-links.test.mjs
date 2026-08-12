@@ -86,7 +86,7 @@ test("Google sign-in uses Firebase popup auth on static hosting", async () => {
   const provider = await readFile(resolve("app/components/AuthProvider.tsx"), "utf8");
   const firebase = await readFile(resolve("app/lib/firebase.ts"), "utf8");
   const button = await readFile(resolve("app/components/GoogleSignInButton.tsx"), "utf8");
-  assert.match(provider, /signInWithPopup\(firebaseAuth, provider, browserPopupRedirectResolver\)/);
+  assert.match(provider, /signInWithPopup\(firebaseAuth, googleProvider, browserPopupRedirectResolver\)/);
   assert.match(firebase, /popupRedirectResolver:\s*browserPopupRedirectResolver/);
   assert.doesNotMatch(button, /use_fedcm_for_button/);
 });
@@ -118,4 +118,33 @@ test("account sign-in keeps only the centered authentication panel", async () =>
   const css = await readFile(resolve("app/globals.css"), "utf8");
   assert.doesNotMatch(account, /className="auth-intro"/);
   assert.match(css, /\.account-auth-layout \{ display: block; width: min\(100%, 620px\); margin-inline: auto;/);
+});
+
+test("customer payment screens use standard order-completion language", async () => {
+  const checkout = await readFile(resolve("app/checkout/page.tsx"), "utf8");
+  const success = await readFile(resolve("app/payment/success/page.tsx"), "utf8");
+  assert.doesNotMatch(checkout, /테스트 모드|실제 금액은 청구되지 않습니다/);
+  assert.doesNotMatch(success, /TEST PAYMENT|Test complete|테스트 결제|테스트 주문|Toss Payments Test|TEST_COMPLETED/);
+  assert.match(success, /ORDER COMPLETE/);
+  assert.match(success, /주문이 정상적으로 완료되었습니다/);
+  assert.match(success, /주문·배송 내역 확인/);
+});
+
+test("Google sign-in avoids forced account selection and redundant persistence waits", async () => {
+  const provider = await readFile(resolve("app/components/AuthProvider.tsx"), "utf8");
+  const layout = await readFile(resolve("app/layout.tsx"), "utf8");
+  assert.doesNotMatch(provider, /prompt:\s*["']select_account/);
+  const googleFlow = provider.slice(provider.indexOf("const signInWithGoogle"), provider.indexOf("const resetPassword"));
+  assert.doesNotMatch(googleFlow, /setPersistence/);
+  assert.doesNotMatch(layout, /accounts\.google\.com\/gsi\/client/);
+  assert.match(layout, /maison-elan-shop\.firebaseapp\.com/);
+});
+
+test("admin orders synchronize across tabs and completed orders retain a recovery snapshot", async () => {
+  const admin = await readFile(resolve("app/admin/page.tsx"), "utf8");
+  const success = await readFile(resolve("app/payment/success/page.tsx"), "utf8");
+  assert.match(admin, /addEventListener\("storage", syncFromAnotherTab\)/);
+  assert.match(success, /syncAdminCache\(pending, payment\)/);
+  assert.match(success, /order: pending/);
+  assert.match(success, /readCompletedOrder\(orderId\)/);
 });
