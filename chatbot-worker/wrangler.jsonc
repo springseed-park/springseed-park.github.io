@@ -1,0 +1,29 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "maison-elan-ai",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-22",
+  "secrets": {
+    "required": ["GROQ_API_KEY"]
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://springseed-park.github.io,http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
+  },
+  "ratelimits": [
+    {
+      "name": "CHAT_RATE_LIMITER",
+      "namespace_id": "2026081201",
+      "simple": { "limit": 10, "period": 60 }
+    },
+    {
+      "name": "CHAT_IP_RATE_LIMITER",
+      "namespace_id": "2026081202",
+      "simple": { "limit": 30, "period": 60 }
+    },
+    {
+      "name": "CHAT_BUDGET_LIMITER",
+      "namespace_id": "2026081203",
+      "simple": { "limit": 120, "period": 60 }
+    }
+  ]
+}

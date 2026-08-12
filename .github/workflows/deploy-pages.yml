@@ -32,6 +32,8 @@ jobs:
 
       - name: Build static site
         run: npm run build
+        env:
+          NEXT_PUBLIC_CHATBOT_API_URL: ${{ vars.CHATBOT_API_URL }}
 
       - name: Preserve Next.js assets on Pages
         run: touch dist/client/.nojekyll

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteFooter, SiteHeader, StoreToast } from "./components/SiteChrome";
 import { StoreProvider } from "./components/StoreProvider";
 import { AuthProvider } from "./components/AuthProvider";
+import { AIChatbot } from "./components/AIChatbot";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             {children}
             <SiteFooter />
             <StoreToast />
+            <AIChatbot />
           </AuthProvider>
         </StoreProvider>
       </body>

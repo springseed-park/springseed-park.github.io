@@ -7,6 +7,8 @@
   },
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
+    "chatbot:dev": "WRANGLER_LOG_PATH=.wrangler/chatbot-dev.log wrangler dev --config chatbot-worker/wrangler.jsonc --port 8787",
+    "chatbot:check": "WRANGLER_LOG_PATH=.wrangler/chatbot.log wrangler deploy --config chatbot-worker/wrangler.jsonc --dry-run --outdir /tmp/maison-elan-chatbot-check",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",

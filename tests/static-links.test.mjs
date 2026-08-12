@@ -150,3 +150,25 @@ test("admin orders synchronize across tabs and completed orders retain a recover
   assert.match(admin, /auth\.orders\.filter/);
   assert.match(admin, /order\.shippingAddress/);
 });
+
+test("AI shopping assistant keeps Groq credentials in the relay only", async () => {
+  const chatbot = await readFile(resolve("app/components/AIChatbot.tsx"), "utf8");
+  const worker = await readFile(resolve("chatbot-worker/src/index.ts"), "utf8");
+  const workflow = await readFile(resolve(".github/workflows/deploy-pages.yml"), "utf8");
+  assert.doesNotMatch(chatbot, /GROQ_API_KEY|gsk_/);
+  assert.match(worker, /openai\/gpt-oss-20b/);
+  assert.match(worker, /env\.GROQ_API_KEY/);
+  assert.match(worker, /CHAT_RATE_LIMITER/);
+  assert.match(worker, /reasoning_effort:\s*"low"/);
+  assert.doesNotMatch(worker, /테스트 모드|실제 금액이 청구되지/);
+  assert.match(chatbot, /X-Chat-Session/);
+  assert.match(chatbot, /http:\/\/localhost:8787/);
+  assert.match(chatbot, /productIds\.has\(slug\)/);
+  assert.match(chatbot, /개인정보·결제정보를 입력하지 마세요/);
+  assert.match(chatbot, /role="log"/);
+  assert.match(worker, /entry\.role === "assistant" \? 1_500 : 500/);
+  assert.match(worker, /!env\.CHAT_RATE_LIMITER/);
+  assert.match(worker, /CHAT_IP_RATE_LIMITER/);
+  assert.match(worker, /CHAT_BUDGET_LIMITER/);
+  assert.match(workflow, /NEXT_PUBLIC_CHATBOT_API_URL:\s*\$\{\{ vars\.CHATBOT_API_URL \}\}/);
+});
