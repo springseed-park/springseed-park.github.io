@@ -13,7 +13,7 @@ export type Product = {
   rating: number;
   reviewCount: number;
   questionCount: number;
-  category: "Outer" | "Dresses" | "Tops" | "Knitwear" | "Bottoms";
+  category: "Outer" | "Dresses" | "Tops" | "Knitwear" | "Bottoms" | "Accessories";
   image: string;
   secondaryImage: string;
   label?: string;
@@ -25,6 +25,28 @@ export type Product = {
 };
 
 export const products: Product[] = [
+  {
+    id: "signature-rib-socks",
+    name: "Signature Rib Socks",
+    price: 1000,
+    rating: 5,
+    reviewCount: 0,
+    questionCount: 0,
+    category: "Accessories",
+    image: "/products/signature-rib-socks/brown-worn.png",
+    secondaryImage: "/products/signature-rib-socks/brown-detail.png",
+    label: "LIMITED",
+    colors: [
+      { name: "Cocoa Brown", hex: "#6b3f26", image: "/products/signature-rib-socks/brown-worn.png", details: ["/products/signature-rib-socks/brown-detail.png"] },
+      { name: "Soft Beige", hex: "#d8c6a9", image: "/products/signature-rib-socks/beige-worn.png", details: ["/products/signature-rib-socks/beige-detail.png"] },
+      { name: "Pure White", hex: "#f5f3ed", image: "/products/signature-rib-socks/white-worn.png", details: ["/products/signature-rib-socks/white-detail.png"] },
+      { name: "Noir Black", hex: "#151414", image: "/products/signature-rib-socks/black-worn.png", details: ["/products/signature-rib-socks/black-detail.png"] },
+    ],
+    sizes: ["FREE"],
+    description: "MAISON ÉLAN 심볼 자수를 더한 한정판 리브 삭스입니다. 섬세한 세로 골지와 안정적인 밴드가 발목을 부드럽게 감싸며 데일리 룩에 절제된 브랜드 포인트를 더합니다.",
+    material: "코튼 78%, 폴리에스터 18%, 폴리우레탄 4%",
+    fit: "FREE · 220–255mm 권장",
+  },
   {
     id: "sculpted-wool-jacket",
     name: "Sculpted Wool Jacket",

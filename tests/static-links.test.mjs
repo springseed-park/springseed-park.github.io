@@ -96,9 +96,21 @@ test("Toss redirect result pages are included in the static Pages build", async 
   assert.equal(await exists(await resolveOutputFile("/payment/fail")), true);
 });
 
-test("GitHub Pages build points Toss requests at the approval server", async () => {
+test("GitHub Pages test checkout has no auxiliary payment server dependency", async () => {
   const workflow = await readFile(resolve(".github/workflows/deploy-pages.yml"), "utf8");
-  assert.match(workflow, /NEXT_PUBLIC_TOSS_API_ORIGIN:\s*https:\/\/maison-elan-seoul\.springseed\.chatgpt\.site/);
+  const checkout = await readFile(resolve("app/checkout/page.tsx"), "utf8");
+  const toss = await readFile(resolve("app/lib/tossPayments.ts"), "utf8");
+  assert.doesNotMatch(workflow, /NEXT_PUBLIC_TOSS_API_ORIGIN/);
+  assert.doesNotMatch(checkout, /api\/payments\/prepare/);
+  assert.match(toss, /test_gck_docs_/);
+});
+
+test("limited socks product and every supplied color image are exported", async () => {
+  assert.equal(await exists(await resolveOutputFile("/product/signature-rib-socks")), true);
+  for (const color of ["brown", "beige", "white", "black"]) {
+    assert.equal(await exists(join(outputRoot, "products", "signature-rib-socks", `${color}-worn.png`)), true);
+    assert.equal(await exists(join(outputRoot, "products", "signature-rib-socks", `${color}-detail.png`)), true);
+  }
 });
 
 test("account sign-in keeps only the centered authentication panel", async () => {

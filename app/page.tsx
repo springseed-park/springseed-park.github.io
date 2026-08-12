@@ -8,7 +8,7 @@ import { ProductCard } from "./components/ProductCard";
 import { ScrollParallaxImage } from "./components/ScrollParallaxImage";
 import { useRuntimeCatalog } from "./components/useRuntimeCatalog";
 
-const categories = ["ALL", "OUTER", "DRESSES", "TOPS", "KNITWEAR", "BOTTOMS"];
+const categories = ["ALL", "OUTER", "DRESSES", "TOPS", "KNITWEAR", "BOTTOMS", "ACCESSORIES"];
 
 const heroSlides = [
   {

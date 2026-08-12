@@ -6,8 +6,8 @@ import { ProductCard } from "../components/ProductCard";
 import { type Product } from "../lib/products";
 import { useRuntimeCatalog } from "../components/useRuntimeCatalog";
 
-const categories = ["All", "Outer", "Dresses", "Tops", "Knitwear", "Bottoms"];
-const sizes = ["XS", "S", "M", "L"];
+const categories = ["All", "Outer", "Dresses", "Tops", "Knitwear", "Bottoms", "Accessories"];
+const sizes = ["XS", "S", "M", "L", "FREE"];
 type ColorGroup = "all" | "black" | "neutral" | "wine";
 type PriceRange = "all" | "under-300" | "300-500" | "over-500";
 

@@ -42,6 +42,7 @@ const measurementPresets: Record<string, MeasurementPreset> = {
   "tailored-wide-trousers": { columns: ["총장", "허리", "힙", "밑위", "밑단"], base: [105, 32, 47, 31, 30], step: [1, 2.5, 2.5, .7, .7] },
   "asymmetric-satin-top": { columns: ["총장", "가슴", "허리", "밑단", "끈 길이"], base: [50, 40, 35, 40, 31], step: [1, 2.5, 2.5, 2.5, .5] },
   "double-faced-coat": { columns: ["총장", "어깨", "가슴", "밑단", "소매"], base: [114, 49, 57, 63, 56], step: [1.5, 1, 2.5, 2.5, 1] },
+  "signature-rib-socks": { columns: ["총장", "발목 폭", "발바닥 길이", "입구 폭"], base: [20, 8, 21, 8], step: [0, 0, 0, 0] },
 };
 
 const categoryMeasurementFallback: Record<Product["category"], MeasurementPreset> = {
@@ -50,6 +51,7 @@ const categoryMeasurementFallback: Record<Product["category"], MeasurementPreset
   Tops: { columns: ["총장", "어깨", "가슴", "밑단", "소매"], base: [61, 39, 48, 50, 58], step: [1, 1, 2.5, 2.5, 1] },
   Knitwear: { columns: ["총장", "어깨", "가슴", "밑단", "소매"], base: [58, 39, 47, 45, 59], step: [1, 1, 2.5, 2.5, 1] },
   Bottoms: { columns: ["총장", "허리", "힙", "밑위", "밑단"], base: [84, 32, 45, 30, 28], step: [1, 2.5, 2.5, .7, .7] },
+  Accessories: { columns: ["총장", "폭", "길이", "입구 폭"], base: [20, 8, 21, 8], step: [0, 0, 0, 0] },
 };
 
 const productHighlights: Record<Product["category"], Array<{ number: string; title: string; body: string }>> = {
@@ -78,6 +80,11 @@ const productHighlights: Record<Product["category"], Array<{ number: string; tit
     { number: "02", title: "Long Silhouette", body: "세로 절개와 중심선을 활용해 다리가 길어 보이면서도 움직임은 편안하도록 설계했습니다." },
     { number: "03", title: "Functional Finish", body: "포켓과 지퍼, 트임 위치를 실제 착용 동선에 맞춰 배치하고 힘이 받는 부분을 보강했습니다." },
   ],
+  Accessories: [
+    { number: "01", title: "Signature Embroidery", body: "발목 옆면에 MAISON ÉLAN 심볼을 тон온톤 자수로 새겨 절제된 브랜드 포인트를 완성했습니다." },
+    { number: "02", title: "Fine Rib Texture", body: "촘촘한 세로 골지가 발목선을 정돈하고 부드러운 코튼 혼방 원사가 편안한 촉감을 유지합니다." },
+    { number: "03", title: "Everyday Comfort", body: "발끝과 뒤꿈치를 안정적으로 보강하고 신축성 있는 밴드로 장시간 착용에도 편안합니다." },
+  ],
 };
 
 function ProductInformation({ product }: { product: Product }) {
@@ -91,7 +98,7 @@ function ProductInformation({ product }: { product: Product }) {
     <section className="product-highlight-section"><p className="eyebrow dark">DESIGN DETAILS</p><div>{productHighlights[product.category].map((item) => <article key={item.number}><span>{item.number}</span><h4>{item.title}</h4><p>{item.body}</p></article>)}</div></section>
     <section className="product-detail-story"><header><p className="eyebrow dark">ALL COLORS</p><h3>모든 컬러와<br />디테일을 한눈에.</h3></header><div className="product-color-collection">{product.colors.map((colorItem, colorIndex) => { const images = [colorItem.image, ...(colorItem.details ?? [])].slice(0, 3); return <section className={`product-color-story ${images.length === 1 ? "is-single" : ""}`} key={colorItem.name}><div className="product-color-title"><span style={{ background: colorItem.hex }} /><div><em>COLOR {String(colorIndex + 1).padStart(2, "0")}</em><h4>{colorItem.name}</h4></div></div><div className="product-color-images">{images.map((image, index) => <figure key={`${colorItem.name}-${image}-${index}`}><img src={image} alt={`${product.name} ${colorItem.name} ${index === 0 ? "전체 착용" : `상세 ${index}`} 이미지`} /><figcaption>{index === 0 ? "FULL SILHOUETTE" : index === 1 ? "CONSTRUCTION DETAIL" : "FABRIC & FINISH"}<span>0{index + 1}</span></figcaption></figure>)}</div></section>; })}</div></section>
     <section className="product-specification"><div className="product-size-heading"><div><p className="eyebrow dark">GARMENT MEASUREMENTS</p><h3>상품 실측 치수</h3></div><p>단위는 cm이며 상품을 바닥에 평평하게 놓고 측정했습니다.<br />측정 위치와 소재 특성에 따라 1–2cm의 오차가 있을 수 있습니다.</p></div><div className="product-measure-table"><table><thead><tr><th>SIZE</th>{preset.columns.map((column) => <th key={column}>{column}</th>)}</tr></thead><tbody>{measurements.map((row) => <tr key={row.size}><th>{row.size}</th>{row.values.map((value, index) => <td key={`${row.size}-${preset.columns[index]}`}>{Number.isInteger(value) ? value : value.toFixed(1)}</td>)}</tr>)}</tbody></table></div><div className="measurement-notes"><p><span>01</span><strong>총장</strong>옆 목점 또는 허리선부터 밑단까지 수직으로 측정합니다.</p><p><span>02</span><strong>{product.category === "Bottoms" ? "허리" : "가슴"}</strong>{product.category === "Bottoms" ? "허리단을 자연스럽게 편 상태의 단면을 측정합니다." : "양쪽 겨드랑이 아래를 수평으로 측정한 단면 기준입니다."}</p><p><span>03</span><strong>핏 참고</strong>신체 치수가 아닌 완성된 상품의 단면 실측으로, 여유분을 고려해 선택해 주세요.</p></div></section>
-    <section className="product-care-grid"><article><p className="eyebrow dark">MATERIAL</p><h4>소재와 촉감</h4><p>{product.material}. 밀도와 복원력을 균형 있게 조정해 형태가 흐트러지지 않으면서도 피부에 닿는 감촉은 부드럽습니다.</p></article><article><p className="eyebrow dark">CARE</p><h4>관리 방법</h4><p>{isOuter ? "형태 보존을 위해 전문 드라이클리닝을 권장합니다. 착용 후 두꺼운 옷걸이에 걸어 통풍해 주세요." : "전문 드라이클리닝을 권장하며, 마찰과 수분에 장시간 노출되지 않도록 주의해 주세요."}</p></article><article><p className="eyebrow dark">PRODUCT INFO</p><h4>제품 정보</h4><dl><div><dt>안감</dt><dd>{isOuter ? "있음" : "상품별 부분 안감"}</dd></div><div><dt>비침</dt><dd>없음</dd></div><div><dt>신축성</dt><dd>{product.category === "Knitwear" ? "좋음" : "약간"}</dd></div><div><dt>두께</dt><dd>{isOuter ? "도톰함" : "보통"}</dd></div><div><dt>제조국</dt><dd>대한민국</dd></div></dl></article></section>
+    <section className="product-care-grid"><article><p className="eyebrow dark">MATERIAL</p><h4>소재와 촉감</h4><p>{product.material}. 밀도와 복원력을 균형 있게 조정해 형태가 흐트러지지 않으면서도 피부에 닿는 감촉은 부드럽습니다.</p></article><article><p className="eyebrow dark">CARE</p><h4>관리 방법</h4><p>{isOuter ? "형태 보존을 위해 전문 드라이클리닝을 권장합니다. 착용 후 두꺼운 옷걸이에 걸어 통풍해 주세요." : product.category === "Accessories" ? "30°C 이하의 찬물에 유사한 색상끼리 세탁하고, 표백제와 건조기 사용을 피한 뒤 그늘에서 자연 건조해 주세요." : "전문 드라이클리닝을 권장하며, 마찰과 수분에 장시간 노출되지 않도록 주의해 주세요."}</p></article><article><p className="eyebrow dark">PRODUCT INFO</p><h4>제품 정보</h4><dl><div><dt>안감</dt><dd>{isOuter ? "있음" : product.category === "Accessories" ? "없음" : "상품별 부분 안감"}</dd></div><div><dt>비침</dt><dd>없음</dd></div><div><dt>신축성</dt><dd>{product.category === "Knitwear" || product.category === "Accessories" ? "좋음" : "약간"}</dd></div><div><dt>두께</dt><dd>{isOuter ? "도톰함" : "보통"}</dd></div><div><dt>제조국</dt><dd>대한민국</dd></div></dl></article></section>
   </div>;
 }
 
@@ -112,7 +119,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const galleryImages = [selectedColor.image, ...(selectedColor.details ?? [])];
   const reviewTotal = product.reviewCount + submittedReviews.length;
   const questionTotal = product.questionCount + submittedQuestions.length;
-  const displayedReviews = [...submittedReviews, ...sampleReviews.map((review, index) => index === 0 ? { ...review, images: selectedColor.details?.slice(0, 2) ?? [selectedColor.image] } : review)];
+  const displayedReviews = [...submittedReviews, ...(product.reviewCount ? sampleReviews.map((review, index) => index === 0 ? { ...review, images: selectedColor.details?.slice(0, 2) ?? [selectedColor.image] } : review) : [])];
   const activeReviewImage = reviewImageModal?.images[reviewImageModal.index];
 
   const moveReviewImage = (direction: -1 | 1) => {
@@ -247,7 +254,7 @@ export function ProductDetail({ product }: { product: Product }) {
           <div className="review-list">{displayedReviews.map((review) => <article key={review.id}><div className="review-score" aria-label={`${review.rating}점`}>{"★★★★★".slice(0, review.rating)}<span>{"★★★★★".slice(review.rating)}</span></div><div className="review-copy"><h3>{review.title}</h3><p>{review.body}</p>{review.images && review.images.length > 0 && <div className="review-photo-grid">{review.images.map((image, index) => { const alt = `${review.title} 리뷰 사진 ${index + 1}`; return <button type="button" onClick={() => setReviewImageModal({ images: review.images ?? [], index, title: review.title })} key={`${review.id}-${image}`} aria-label={`${review.title} 사진 ${index + 1} 크게 보기`}><img src={image} alt={alt} /></button>; })}</div>}<span>{review.option}</span></div><div className="review-author"><strong>{review.author}</strong><span>{review.date}</span></div></article>)}</div>
         </div> : <div className="question-panel" role="tabpanel">
           {writeMode === "question" && <form className="feedback-form" onSubmit={submitQuestion}><div className="feedback-form-heading"><h3>상품 문의</h3><button type="button" onClick={() => setWriteMode(null)} aria-label="작성 취소"><X size={20} /></button></div><div className="feedback-form-grid"><label>문의 유형<select name="category" defaultValue="상품"><option>상품</option><option>사이즈</option><option>배송</option><option>교환·반품</option></select></label><label className="full">제목<input name="title" required placeholder="문의 제목을 입력해 주세요" /></label><label className="full">내용<textarea name="body" required rows={5} placeholder="궁금한 내용을 자세히 입력해 주세요." /></label><label className="question-private"><input type="checkbox" name="private" /><span>비밀글로 문의하기</span></label></div><button className="primary-button" type="submit">문의 등록</button></form>}
-          <div className="question-list">{[...submittedQuestions, ...sampleQuestions].sort((a, b) => b.createdAt - a.createdAt).map((question) => <article key={question.id}><div className={`question-status ${question.status === "답변완료" ? "is-complete" : ""}`}>{question.status}</div><div className="question-copy"><p>{question.category}{question.private && <span>비밀글</span>}</p><h3>{question.title}</h3><p>{question.body}</p>{question.answer && <div className="question-answer"><strong>MAISON ÉLAN</strong><p>{question.answer}</p></div>}</div><div className="question-author"><strong>{question.author}</strong><span>{question.date}</span></div></article>)}</div>
+          <div className="question-list">{[...submittedQuestions, ...(product.questionCount ? sampleQuestions : [])].sort((a, b) => b.createdAt - a.createdAt).map((question) => <article key={question.id}><div className={`question-status ${question.status === "답변완료" ? "is-complete" : ""}`}>{question.status}</div><div className="question-copy"><p>{question.category}{question.private && <span>비밀글</span>}</p><h3>{question.title}</h3><p>{question.body}</p>{question.answer && <div className="question-answer"><strong>MAISON ÉLAN</strong><p>{question.answer}</p></div>}</div><div className="question-author"><strong>{question.author}</strong><span>{question.date}</span></div></article>)}</div>
         </div>}
       </section>
       <section className="recommend-section"><div className="subpage-heading"><p className="eyebrow dark">COMPLETE THE LOOK</p><h2>Style with</h2></div><div className="product-grid">{products.filter((item) => item.id !== product.id).slice(0, 4).map((item) => <ProductCard key={item.id} product={item} />)}</div></section>

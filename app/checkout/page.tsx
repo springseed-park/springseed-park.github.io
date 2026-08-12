@@ -9,14 +9,12 @@ import PostcodeFields from "../components/PostcodeFields";
 import { useStore } from "../components/StoreProvider";
 import { formatPrice, getProduct } from "../lib/products";
 import {
-  paymentApiFetch,
   TOSS_PENDING_ORDER_KEY,
   TOSS_WIDGET_CLIENT_KEY,
   tossCustomerKey,
-  tossItemsDigest,
   tossPaymentErrorMessage,
 } from "../lib/tossPayments";
-import type { PendingTossOrder, TossPrepareResponse } from "../lib/tossPayments";
+import type { PendingTossOrder } from "../lib/tossPayments";
 
 type CheckoutLine = { id: string; size: string; color: string; quantity: number };
 
@@ -163,38 +161,15 @@ export default function CheckoutPage() {
     };
 
     try {
-      const expectedItemsDigest = await tossItemsDigest(orderLines);
-      const prepared = await paymentApiFetch<TossPrepareResponse>("/api/payments/prepare", {
-        method: "POST",
-        body: JSON.stringify({
-          orderId,
-          items: orderLines.map(({ id, size, color, quantity }) => ({ id, size, color, quantity })),
-          ...(selectedCoupon ? { couponCode: selectedCoupon.code } : {}),
-        }),
-      });
-      if (
-        prepared.orderId !== orderId
-        || prepared.amount !== total
-        || prepared.subtotal !== subtotal
-        || prepared.discount !== discount
-        || prepared.shippingFee !== shippingFee
-        || prepared.itemsDigest !== expectedItemsDigest
-        || !prepared.intentToken
-      ) {
-        throw Object.assign(new Error("주문 금액을 다시 확인해 주세요."), { code: "ORDER_AMOUNT_MISMATCH" });
-      }
-
-      const orderName = prepared.orderName || fallbackOrderName(orderLines);
+      const orderName = fallbackOrderName(orderLines);
       const pendingOrder: PendingTossOrder = {
         userUid: auth.user.uid,
         orderId,
         orderName,
-        intentToken: prepared.intentToken,
-        itemsDigest: prepared.itemsDigest,
-        amount: prepared.amount,
-        subtotal: prepared.subtotal,
-        discount: prepared.discount,
-        shippingFee: prepared.shippingFee,
+        amount: total,
+        subtotal,
+        discount,
+        shippingFee,
         coupon: selectedCoupon ? { id: selectedCoupon.id, name: selectedCoupon.name, code: selectedCoupon.code } : null,
         shippingAddress,
         items: orderedItems,
@@ -206,7 +181,7 @@ export default function CheckoutPage() {
         createdAt: new Date().toISOString(),
       };
       localStorage.setItem(TOSS_PENDING_ORDER_KEY, JSON.stringify(pendingOrder));
-      await widgets.setAmount({ currency: "KRW", value: prepared.amount });
+      await widgets.setAmount({ currency: "KRW", value: total });
       const mobilePhone = phone.replace(/\D/g, "");
       await widgets.requestPayment({
         orderId,
