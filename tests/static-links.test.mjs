@@ -147,8 +147,8 @@ test("admin orders synchronize across tabs and completed orders retain a recover
   assert.match(success, /syncAdminCache\(pending, payment\)/);
   assert.match(success, /order: pending/);
   assert.match(success, /readCompletedOrder\(orderId\)/);
-  assert.match(admin, /auth\.orders\.filter/);
-  assert.match(admin, /order\.shippingAddress/);
+  assert.doesNotMatch(admin, /auth\.orders\.filter/);
+  assert.doesNotMatch(admin, /useAuth/);
 });
 
 test("AI shopping assistant keeps Groq credentials in the relay only", async () => {
@@ -198,6 +198,20 @@ test("admin keeps editable hero history and persists member memo changes", async
   assert.match(admin, /localStorage\.setItem\("maison-admin-members"/);
   assert.match(home, /filter\(\(slide\) => slide && slide\.active !== false\)/);
   assert.match(home, /sort\(\(left, right\) => \(Number\(left\.order\)/);
+});
+
+test("admin is independent from customer login and account hides used coupons", async () => {
+  const admin = await readFile(resolve("app/admin/page.tsx"), "utf8");
+  const account = await readFile(resolve("app/account/page.tsx"), "utf8");
+  const provider = await readFile(resolve("app/components/AuthProvider.tsx"), "utf8");
+  assert.match(admin, /mergeDefaultMembers/);
+  assert.match(admin, /usePersistentState\("maison-admin-members", initialMembers, mergeDefaultMembers\)/);
+  assert.match(admin, /maison-admin-unlocked/);
+  assert.match(admin, /adminPassword !== "1234"/);
+  assert.doesNotMatch(admin, /useAuth/);
+  assert.doesNotMatch(provider, /syncLocalAdminMember/);
+  assert.match(account, /coupons\.filter\(\(coupon\) => !coupon\.used\)/);
+  assert.doesNotMatch(account, /coupon\.used \? "USED"/);
 });
 
 test("store navigation is simplified and the event socks explain their purpose", async () => {

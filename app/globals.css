@@ -1057,6 +1057,18 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 
 /* Store admin */
 .admin-page { background: #e6e3dc; }
+.admin-lock-page { min-height: 100svh; display: grid; place-items: center; padding: 118px 20px 70px; background: #e6e3dc; }
+.admin-lock-card { width: min(100%, 470px); padding: 54px 50px 42px; text-align: center; border: 1px solid rgba(20,18,17,.14); background: var(--ivory); box-shadow: 0 22px 70px rgba(20,18,17,.08); }
+.admin-lock-card > img { width: 47px; margin-bottom: 28px; }
+.admin-lock-card h1 { margin: 15px 0 14px; font: 400 54px/.95 var(--font-serif); }
+.admin-lock-card > span { color: #716a64; font-size: 13px; }
+.admin-lock-card form { display: grid; gap: 13px; margin-top: 38px; text-align: left; }
+.admin-lock-card label { display: grid; gap: 8px; color: #5f5953; font-size: 13px; }
+.admin-lock-card input { height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 0; outline: 0; background: white; font-size: 14px; }
+.admin-lock-card input:focus { border-color: var(--ink); }
+.admin-lock-card form > p { margin: -3px 0 0; color: #a13545; font-size: 12px; }
+.admin-lock-card form button { min-height: 49px; color: white; border: 1px solid var(--ink); background: var(--ink); cursor: pointer; font-size: 13px; }
+.admin-lock-return { display: inline-block; margin-top: 26px; padding: 0 0 4px; color: #6f6861; border: 0; border-bottom: 1px solid; background: transparent; cursor: pointer; font-size: 12px; }
 .admin-shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: calc(100svh - 68px); }
 .admin-sidebar { position: sticky; top: 68px; height: calc(100svh - 68px); display: flex; flex-direction: column; padding: 34px 20px 25px; color: #eee9e2; background: #171513; }
 .admin-identity { display: flex; align-items: center; gap: 13px; padding: 0 8px 30px; border-bottom: 1px solid rgba(255,255,255,.13); }

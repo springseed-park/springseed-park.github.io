@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState } from "react";
 import { formatPrice, Product, products } from "../lib/products";
-import { type MemberCoupon, type PaymentInfo, useAuth } from "../components/AuthProvider";
+import { type MemberCoupon, type PaymentInfo } from "../components/AuthProvider";
 
 type AdminTab = "dashboard" | "products" | "hero" | "orders" | "inquiries" | "members" | "newsletter";
 type ProductStatus = "판매중" | "품절" | "판매중지";
@@ -100,6 +100,12 @@ function mergeDefaultProducts(saved: AdminProduct[]) {
   return missing.length ? [...missing, ...saved] : saved;
 }
 
+function mergeDefaultMembers(saved: Member[]) {
+  const savedEmails = new Set(saved.map((member) => member.email.toLocaleLowerCase()));
+  const missing = initialMembers.filter((member) => !savedEmails.has(member.email.toLocaleLowerCase()));
+  return missing.length ? [...saved, ...missing] : saved;
+}
+
 function mergeHeroSlides(saved: HeroSlide[]) {
   return saved.map((slide, index) => ({ ...slide, id: slide.id || `hero-${Date.now()}-${index}`, active: slide.active !== false, order: Number(slide.order) || index + 1, createdAt: slide.createdAt || "2026.08.12", updatedAt: slide.updatedAt || "2026.08.12" })).sort((a, b) => a.order - b.order);
 }
@@ -130,14 +136,16 @@ function usePersistentState<T>(key: string, initial: T, mergeSaved?: (saved: T) 
 }
 
 export default function AdminPage() {
-  const auth = useAuth();
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState("");
   const [tab, setTab] = useState<AdminTab>("dashboard");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("전체");
   const [catalog, setCatalog] = usePersistentState("maison-admin-products", defaultProducts, mergeDefaultProducts);
   const [orders, setOrders] = usePersistentState("maison-admin-orders", initialOrders);
   const [inquiries, setInquiries] = usePersistentState("maison-admin-inquiries", initialInquiries);
-  const [members, setMembers] = usePersistentState("maison-admin-members", initialMembers);
+  const [members, setMembers] = usePersistentState("maison-admin-members", initialMembers, mergeDefaultMembers);
   const [heroSlides, setHeroSlides] = usePersistentState("maison-admin-hero-slides", initialHeroSlides, mergeHeroSlides);
   const [newsletterSubscribers, setNewsletterSubscribers] = usePersistentState("maison-newsletter-subscribers", initialNewsletterSubscribers);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | "new" | null>(null);
@@ -145,27 +153,9 @@ export default function AdminPage() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [openInquiry, setOpenInquiry] = useState<number | null>(null);
   useEffect(() => {
-    if (!auth.user || auth.orders.length === 0) return;
-    setOrders((current) => {
-      const currentIds = new Set(current.map((order) => order.id));
-      const missingOrders: Order[] = auth.orders.filter((order) => !currentIds.has(order.orderNumber)).map((order) => ({
-        id: order.orderNumber,
-        customer: order.shippingAddress?.recipient || auth.profile?.displayName || "회원 고객",
-        email: auth.user?.email || auth.profile?.email || "",
-        phone: order.shippingAddress?.phone || auth.profile?.phone || "",
-        address: order.shippingAddress ? `[${order.shippingAddress.postalCode}] ${order.shippingAddress.addressLine1} ${order.shippingAddress.addressLine2}`.trim() : "회원 배송지",
-        items: order.items.map((product, index) => ({ ...product, status: order.itemShipments?.[index]?.status as OrderStatus | undefined, courier: order.itemShipments?.[index]?.courier, trackingNumber: order.itemShipments?.[index]?.trackingNumber, estimatedDelivery: order.itemShipments?.[index]?.estimatedDelivery })),
-        amount: order.total,
-        date: order.createdAt?.toLocaleString("ko-KR") || "방금 전",
-        status: "결제완료",
-        courier: order.courier || "배송 준비 중",
-        trackingNumber: order.trackingNumber || "",
-        memo: "",
-        payment: order.payment,
-      }));
-      return missingOrders.length ? [...missingOrders, ...current] : current;
-    });
-  }, [auth.orders, auth.profile, auth.user, setOrders]);
+    const frame = window.requestAnimationFrame(() => setAdminUnlocked(sessionStorage.getItem("maison-admin-unlocked") === "true"));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
   const pendingInquiries = inquiries.filter((item) => item.status !== "처리완료").length;
   const filteredProducts = useMemo(() => catalog.filter((product) => (category === "전체" || product.category === category) && `${product.name} ${product.category} ${product.sku}`.toLowerCase().includes(query.toLowerCase())), [catalog, category, query]);
   const revenue = orders.filter((order) => order.status !== "취소" && order.status !== "환불완료").reduce((sum, order) => sum + order.amount, 0);
@@ -186,6 +176,17 @@ export default function AdminPage() {
     setInquiries((current) => current.map((item) => item.id === id ? { ...item, answer, status: "처리완료" } : item));
   };
   const saveMember = (member: Member) => { const next = members.map((item) => item.id === member.id ? member : item); setMembers(next); localStorage.setItem("maison-admin-members", JSON.stringify(next)); window.dispatchEvent(new CustomEvent("maison-storage-updated", { detail: { key: "maison-admin-members" } })); setSelectedMember(null); };
+
+  const unlockAdmin = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (adminPassword !== "1234") { setAdminError("관리자 비밀번호가 올바르지 않습니다."); return; }
+    sessionStorage.setItem("maison-admin-unlocked", "true");
+    setAdminError("");
+    setAdminPassword("");
+    setAdminUnlocked(true);
+  };
+
+  if (!adminUnlocked) return <main id="content" className="inner-page admin-page admin-lock-page"><section className="admin-lock-card"><img src="/maison-elan-symbol.svg" alt="" /><p className="eyebrow dark">MAISON ÉLAN / MANAGEMENT</p><h1>Administrator</h1><span>쇼핑몰 운영을 위한 관리자 전용 화면입니다.</span><form onSubmit={unlockAdmin}><label>관리자 비밀번호<input type="password" inputMode="numeric" autoComplete="current-password" value={adminPassword} onChange={(event) => { setAdminPassword(event.target.value); setAdminError(""); }} placeholder="비밀번호 입력" /></label>{adminError && <p role="alert">{adminError}</p>}<button type="submit">관리자 화면 들어가기</button></form><button className="admin-lock-return" type="button" onClick={() => window.location.assign("/")}>쇼핑몰로 돌아가기</button></section></main>;
 
   return <main id="content" className="inner-page admin-page"><div className="admin-shell">
     <aside className="admin-sidebar"><div className="admin-identity"><img src="/maison-elan-symbol.svg" alt="" /><div><strong>MAISON ÉLAN</strong><span>STORE ADMIN</span></div></div><nav aria-label="관리자 메뉴">{adminNav.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}><Icon size={18} strokeWidth={1.4} /><span>{item.label}</span>{item.id === "inquiries" && pendingInquiries > 0 && <em>{pendingInquiries}</em>}</button>; })}</nav></aside>

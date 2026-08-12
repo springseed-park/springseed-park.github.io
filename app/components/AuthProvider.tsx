@@ -184,15 +184,6 @@ function normalizeAddresses(saved: Partial<MemberProfile>) {
   return withIds.map((address, index) => ({ ...address, isDefault: index === defaultIndex }));
 }
 
-function syncLocalAdminMember(user: User, profile: MemberProfile) {
-  try {
-    const members = JSON.parse(localStorage.getItem("maison-admin-members") || "[]") as Array<Record<string, unknown> & { email: string }>;
-    const current = members.find((member) => member.email === profile.email);
-    const member = { id: current?.id ?? `ME-M-${user.uid.slice(0, 6).toUpperCase()}`, name: profile.displayName, email: profile.email, phone: profile.phone, joinedAt: current?.joinedAt ?? new Date().toLocaleDateString("ko-KR"), lastLogin: new Date().toLocaleString("ko-KR"), orderCount: current?.orderCount ?? 0, totalSpent: current?.totalSpent ?? 0, status: current?.status ?? "정상", address: `${profile.address.addressLine1} ${profile.address.addressLine2}`.trim(), memo: current?.memo ?? "" };
-    localStorage.setItem("maison-admin-members", JSON.stringify(current ? members.map((item) => item.email === profile.email ? member : item) : [member, ...members]));
-  } catch { /* admin cache is optional */ }
-}
-
 export function firebaseErrorMessage(error: unknown) {
   const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
   const messages: Record<string, string> = {
@@ -250,7 +241,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (snapshot.exists() && !Array.isArray(saved.coupons)) await setDoc(userRef, { coupons, updatedAt: serverTimestamp() }, { merge: true });
       const resolvedProfile = { ...fallback, ...saved, address: defaultAddress, addresses, coupons } as MemberProfile;
       setProfile(resolvedProfile);
-      syncLocalAdminMember(nextUser, resolvedProfile);
     } catch {
       setProfile(fallback);
     }
@@ -351,7 +341,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextProfile = { displayName: name, email, phone, address: defaultAddress, addresses: [defaultAddress], coupons: [createWelcomeCoupon()] };
     await setDoc(doc(firestore, "users", credential.user.uid), { ...nextProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     setProfile(nextProfile);
-    syncLocalAdminMember(credential.user, nextProfile);
   };
   const signInWithGoogle = async () => {
     setAuthError("");
@@ -364,7 +353,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await updateProfile(user, { displayName: data.displayName });
     await setDoc(doc(firestore, "users", user.uid), { ...data, updatedAt: serverTimestamp() }, { merge: true });
     setProfile((current) => current ? { ...current, ...data } : current);
-    if (profile) syncLocalAdminMember(user, { ...profile, ...data });
   };
   const saveAddress = async (address: MemberAddress) => {
     if (!user) return;
@@ -380,7 +368,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await setDoc(doc(firestore, "users", user.uid), { addresses, address: defaultAddress, updatedAt: serverTimestamp() }, { merge: true });
     const nextProfile = profile ? { ...profile, addresses, address: defaultAddress } : null;
     setProfile(nextProfile);
-    if (nextProfile) syncLocalAdminMember(user, nextProfile);
   };
   const deleteAddress = async (addressId: string) => {
     if (!user || !profile) return;
@@ -390,7 +377,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await setDoc(doc(firestore, "users", user.uid), { addresses, address: defaultAddress, updatedAt: serverTimestamp() }, { merge: true });
     const nextProfile = { ...profile, addresses, address: defaultAddress };
     setProfile(nextProfile);
-    syncLocalAdminMember(user, nextProfile);
   };
   const setDefaultAddress = async (addressId: string) => {
     if (!user || !profile) return;
@@ -400,7 +386,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await setDoc(doc(firestore, "users", user.uid), { addresses, address: defaultAddress, updatedAt: serverTimestamp() }, { merge: true });
     const nextProfile = { ...profile, addresses, address: defaultAddress };
     setProfile(nextProfile);
-    syncLocalAdminMember(user, nextProfile);
   };
   const useCoupon = async (couponId: string) => {
     if (!user || !profile) return;
