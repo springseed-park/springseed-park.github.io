@@ -22,6 +22,9 @@ export type Product = {
   description: string;
   material: string;
   fit: string;
+  detailHighlights?: string[];
+  careInstructions?: string;
+  origin?: string;
 };
 
 export const products: Product[] = [
@@ -43,7 +46,7 @@ export const products: Product[] = [
       { name: "Noir Black", hex: "#151414", image: "/products/signature-rib-socks/black-worn.png", details: ["/products/signature-rib-socks/black-detail.png"] },
     ],
     sizes: ["FREE"],
-    description: "MAISON ÉLAN 심볼 자수를 더한 한정판 리브 삭스입니다. 섬세한 세로 골지와 안정적인 밴드가 발목을 부드럽게 감싸며 데일리 룩에 절제된 브랜드 포인트를 더합니다.",
+    description: "메종 엘란이 고객을 위한 특별 이벤트로 제작한 리미티드 리브 삭스입니다. 브랜드 심볼 자수와 섬세한 세로 골지를 담았으며, 안정적인 밴드가 발목을 부드럽게 감싸 데일리 룩에 절제된 포인트를 더합니다.",
     material: "코튼 78%, 폴리에스터 18%, 폴리우레탄 4%",
     fit: "FREE · 220–255mm 권장",
   },

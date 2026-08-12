@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, RotateCcw, Send, Sparkles, X } from "lucide-react";
+import { MessageCircle, RotateCcw, Send, X } from "lucide-react";
 import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { products } from "../lib/products";
 
@@ -149,7 +149,7 @@ export function AIChatbot() {
     <div className={`ai-chatbot ${open ? "is-open" : ""}`}>
       {open && <section id="ai-chat-panel" className="ai-chat-panel" role="dialog" aria-modal="false" aria-labelledby="ai-chat-title">
         <header>
-          <div><span><Sparkles size={17} /></span><p><strong id="ai-chat-title">ÉLAN AI</strong><em><i />스타일 어시스턴트</em></p></div>
+          <div><span className="ai-chat-brand-symbol"><img src="/maison-elan-symbol.svg" alt="" aria-hidden="true" /></span><p><strong id="ai-chat-title">ÉLAN AI</strong><em><i />스타일 어시스턴트</em></p></div>
           <nav aria-label="AI 상담 메뉴"><button type="button" onClick={reset} aria-label="새 대화 시작"><RotateCcw size={18} /></button><button type="button" onClick={close} aria-label="AI 상담 닫기"><X size={20} /></button></nav>
         </header>
         <div className="ai-chat-messages" ref={listRef} role="log" aria-live="polite" aria-relevant="additions text">
@@ -165,7 +165,7 @@ export function AIChatbot() {
         </form>
         <small>개인정보·결제정보를 입력하지 마세요. AI는 개인 주문을 조회하지 못하며 답변은 참고용입니다.</small>
       </section>}
-      <button ref={toggleRef} className="ai-chat-toggle" type="button" onClick={() => open ? close() : setOpen(true)} aria-expanded={open} aria-controls="ai-chat-panel" aria-label={open ? "AI 상담 닫기" : "AI 상담 열기"}>{open ? <X /> : <><Sparkles size={17} /><MessageCircle size={23} /></>}</button>
+      <button ref={toggleRef} className="ai-chat-toggle" type="button" onClick={() => open ? close() : setOpen(true)} aria-expanded={open} aria-controls="ai-chat-panel" aria-label={open ? "AI 상담 닫기" : "AI 상담 열기"}>{open ? <X size={22} /> : <MessageCircle size={24} strokeWidth={1.35} />}</button>
     </div>
   );
 }

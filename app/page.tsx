@@ -10,7 +10,7 @@ import { useRuntimeCatalog } from "./components/useRuntimeCatalog";
 
 const categories = ["ALL", "OUTER", "DRESSES", "TOPS", "KNITWEAR", "BOTTOMS", "ACCESSORIES"];
 
-const heroSlides = [
+export const defaultHeroSlides = [
   {
     eyebrow: "MAISON ÉLAN / AW 2026",
     title: "The New",
@@ -48,6 +48,7 @@ const heroSlides = [
 
 export default function Home() {
   const products = useRuntimeCatalog();
+  const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeHero, setActiveHero] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
@@ -58,10 +59,30 @@ export default function Home() {
   const swipeStart = useRef<number | null>(null);
 
   useEffect(() => {
+    const loadHero = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem("maison-admin-hero-slides") || "null");
+        if (Array.isArray(saved) && saved.length) {
+          const activeSlides = saved
+            .filter((slide) => slide && slide.active !== false)
+            .sort((left, right) => (Number(left.order) || 0) - (Number(right.order) || 0));
+          setHeroSlides(activeSlides.length ? activeSlides : defaultHeroSlides);
+          setActiveHero(0);
+        }
+      } catch { /* use the bundled campaign */ }
+    };
+    loadHero();
+    const onStorage = (event: StorageEvent) => { if (event.key === "maison-admin-hero-slides") loadHero(); };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("maison-hero-updated", loadHero);
+    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("maison-hero-updated", loadHero); };
+  }, []);
+
+  useEffect(() => {
     if (heroPaused || heroFocusPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => setActiveHero((current) => (current + 1) % heroSlides.length), 5600);
     return () => window.clearInterval(timer);
-  }, [heroPaused, heroFocusPaused, activeHero]);
+  }, [heroPaused, heroFocusPaused, activeHero, heroSlides.length]);
 
   const moveHero = (direction: number) => {
     setActiveHero((current) => (current + direction + heroSlides.length) % heroSlides.length);
@@ -104,6 +125,13 @@ export default function Home() {
   const subscribe = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email.trim()) return;
+    const normalizedEmail = email.trim().toLowerCase();
+    try {
+      const current = JSON.parse(localStorage.getItem("maison-newsletter-subscribers") || "[]") as Array<{ email: string; subscribedAt: string; status: string }>;
+      if (!current.some((subscriber) => subscriber.email === normalizedEmail)) current.unshift({ email: normalizedEmail, subscribedAt: new Date().toISOString(), status: "구독중" });
+      localStorage.setItem("maison-newsletter-subscribers", JSON.stringify(current));
+      window.dispatchEvent(new CustomEvent("maison-storage-updated", { detail: { key: "maison-newsletter-subscribers" } }));
+    } catch { /* keep the confirmation visible even if storage is unavailable */ }
     setSubscribed(true);
   };
 
@@ -116,7 +144,7 @@ export default function Home() {
     <main>
       <section id="top" ref={heroRef} className={`hero${heroPaused ? " is-paused" : ""}`} aria-labelledby="hero-title" onFocusCapture={() => setHeroFocusPaused(true)} onBlurCapture={() => setHeroFocusPaused(false)} onPointerMove={moveHeroPointer} onPointerLeave={resetHeroPointer} onPointerDown={(event) => { swipeStart.current = event.clientX; }} onPointerUp={endHeroSwipe} onPointerCancel={() => { swipeStart.current = null; }}>
         <div className="hero-slides" aria-hidden="true">
-          {heroSlides.map((slide, index) => <div key={slide.image} className={`hero-slide ${index === activeHero ? "is-active" : ""}`}><img className={slide.imageClass} src={slide.image} alt="" loading={index === 0 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : "auto"} /></div>)}
+          {heroSlides.map((slide, index) => <div key={`${slide.image}-${index}`} className={`hero-slide ${index === activeHero ? "is-active" : ""}`}><img className={slide.imageClass} src={slide.image} alt="" loading={index === 0 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : "auto"} /></div>)}
         </div>
         <HeroScene activeIndex={activeHero} />
         <div className="hero-pointer-light" aria-hidden="true" />
@@ -138,7 +166,7 @@ export default function Home() {
           <button type="button" onClick={() => moveHero(1)} aria-label="다음 캠페인"><ArrowRight size={18} strokeWidth={1.25} /></button>
           <button className="hero-pause" type="button" onClick={(event) => { setHeroPaused((current) => !current); event.currentTarget.blur(); }} aria-label={heroPaused ? "캠페인 자동 전환 재생" : "캠페인 자동 전환 일시정지"} aria-pressed={heroPaused}>{heroPaused ? <Play size={16} /> : <Pause size={16} />}</button>
         </div>
-        <nav className="hero-campaign-index" aria-label="캠페인 바로가기">{heroSlides.map((slide, index) => <button className={activeHero === index ? "active" : ""} type="button" onClick={() => moveHeroTo(index)} aria-current={activeHero === index ? "true" : undefined} key={slide.image}><span>0{index + 1}</span><em>{slide.accent}</em></button>)}</nav>
+        <nav className="hero-campaign-index" aria-label="캠페인 바로가기">{heroSlides.map((slide, index) => <button className={activeHero === index ? "active" : ""} type="button" onClick={() => moveHeroTo(index)} aria-current={activeHero === index ? "true" : undefined} key={`${slide.image}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><em>{slide.accent}</em></button>)}</nav>
         <p className="hero-index">ÉLAN / CAMPAIGN 26 — SEOUL</p>
         <a className="scroll-cue" href="#content" aria-label="다음 섹션으로 이동"><span>SCROLL TO DISCOVER</span><i /></a>
       </section>
@@ -147,8 +175,7 @@ export default function Home() {
         <section id="best" className="products-section section-pad">
           <div className="section-heading section-heading-branded">
             <div><p className="eyebrow dark">MOST LOVED / TOP RATED</p><h2>Best Sellers</h2></div>
-            <img className="section-brand-symbol" src="/maison-elan-symbol.svg" alt="" aria-hidden="true" />
-            <p className="section-intro">높은 평점과 풍부한 리뷰로 선택받은<br />메종 엘란의 가장 사랑받는 실루엣.</p>
+            <p className="section-intro"><img className="section-brand-symbol" src="/maison-elan-symbol.svg" alt="" aria-hidden="true" /><span>높은 평점과 풍부한 리뷰로 선택받은<br />메종 엘란의 가장 사랑받는 실루엣.</span></p>
           </div>
           <div className="category-row" aria-label="상품 카테고리">
             <div className="category-tabs">

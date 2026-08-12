@@ -2,9 +2,10 @@
 
 import Link from "./StaticLink";
 import { usePathname } from "next/navigation";
-import { Heart, Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
+import { ArrowUp, Heart, Home, Menu, Search, ShoppingBag, Store, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStore } from "./StoreProvider";
+import { useAuth } from "./AuthProvider";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -12,6 +13,7 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(!isHome);
   const [menuOpen, setMenuOpen] = useState(false);
   const { cartCount, wishlist } = useStore();
+  const auth = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(!isHome || window.scrollY > 48);
@@ -34,8 +36,7 @@ export function SiteHeader() {
         <nav className="header-utilities icon-utilities" aria-label="유틸리티 메뉴">
           <Link href="/search" aria-label="검색"><Search size={19} strokeWidth={1.35} /></Link>
           <Link href="/account" aria-label="계정"><UserRound size={19} strokeWidth={1.35} /></Link>
-          <Link href="/wishlist" aria-label={`위시리스트 상품 ${wishlist.length}개`}><Heart size={19} strokeWidth={1.35} /><span className="icon-badge">{wishlist.length}</span></Link>
-          <Link href="/cart" aria-label={`장바구니 상품 ${cartCount}개`}><ShoppingBag size={20} strokeWidth={1.35} /><span className="icon-badge">{cartCount}</span></Link>
+          {!auth.loading && auth.user && <><Link href="/wishlist" aria-label={`위시리스트 상품 ${wishlist.length}개`}><Heart size={19} strokeWidth={1.35} /><span className="icon-badge">{wishlist.length}</span></Link><Link href="/cart" aria-label={`장바구니 상품 ${cartCount}개`}><ShoppingBag size={20} strokeWidth={1.35} /><span className="icon-badge">{cartCount}</span></Link></>}
         </nav>
       </header>
       <aside id="mobile-menu-drawer" className={`menu-drawer ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen} inert={!menuOpen ? true : undefined}>
@@ -43,13 +44,42 @@ export function SiteHeader() {
         <img className="drawer-brand-symbol" src="/maison-elan-symbol.svg" alt="" aria-hidden="true" />
         <p className="eyebrow">MENU / 2026</p>
         <nav aria-label="모바일 메뉴">
-          <Link href="/#best" onClick={() => setMenuOpen(false)}>Best Sellers <sup>08</sup></Link><Link href="/shop" onClick={() => setMenuOpen(false)}>Shop All</Link><Link href="/editorial" onClick={() => setMenuOpen(false)}>Editorial <sup>08</sup></Link><Link href="/search" onClick={() => setMenuOpen(false)}>Search</Link>
+          <Link href="/#best" onClick={() => setMenuOpen(false)}>Best Sellers</Link><Link href="/shop" onClick={() => setMenuOpen(false)}>Shop</Link><Link href="/editorial" onClick={() => setMenuOpen(false)}>Editorial</Link><Link href="/search" onClick={() => setMenuOpen(false)}>Search</Link>
         </nav>
-        <div className="drawer-meta"><Link href="/account" onClick={() => setMenuOpen(false)}>로그인 · 마이페이지</Link><Link href="/wishlist" onClick={() => setMenuOpen(false)}>Wishlist ({wishlist.length})</Link><p>Seoul · KRW</p></div>
+        <div className="drawer-meta"><Link href="/account" onClick={() => setMenuOpen(false)}>{auth.user ? "마이페이지" : "로그인 · 회원가입"}</Link>{auth.user && <Link href="/wishlist" onClick={() => setMenuOpen(false)}>Wishlist ({wishlist.length})</Link>}<p>Seoul · KRW</p></div>
       </aside>
       <button className={`page-scrim ${menuOpen ? "is-visible" : ""}`} type="button" onClick={() => setMenuOpen(false)} aria-label="메뉴 닫기" tabIndex={menuOpen ? 0 : -1} />
     </>
   );
+}
+
+export function MobileNavigation() {
+  const pathname = usePathname();
+  const [showTop, setShowTop] = useState(false);
+  const { cartCount } = useStore();
+  const auth = useAuth();
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > Math.max(520, window.innerHeight * .7));
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const items = [
+    { href: "/", label: "홈", icon: Home, active: pathname === "/" },
+    { href: "/#best", label: "베스트", icon: Heart, active: pathname === "/" && typeof window !== "undefined" && window.location.hash === "#best" },
+    { href: "/shop", label: "쇼핑", icon: Store, active: pathname === "/shop" || pathname.startsWith("/product/") },
+    { href: "/account", label: "마이", icon: UserRound, active: pathname === "/account" },
+    { href: auth.user ? "/cart" : "/account?returnTo=/cart", label: auth.user ? "쇼핑백" : "로그인", icon: auth.user ? ShoppingBag : UserRound, active: pathname === "/cart" },
+  ];
+
+  return <>
+    <button className={`back-to-top ${showTop ? "is-visible" : ""}`} type="button" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })} aria-label="페이지 맨 위로 이동"><ArrowUp size={19} strokeWidth={1.35} /></button>
+    <nav className="mobile-bottom-nav" aria-label="모바일 바로가기">
+      {items.map(({ href, label, icon: Icon, active }) => <Link href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined} key={label}><span><Icon size={20} strokeWidth={1.35} />{label === "쇼핑백" && cartCount > 0 && <em>{cartCount}</em>}</span><b>{label}</b></Link>)}
+    </nav>
+  </>;
 }
 
 export function SiteFooter() {

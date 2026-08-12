@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SiteFooter, SiteHeader, StoreToast } from "./components/SiteChrome";
+import { MobileNavigation, SiteFooter, SiteHeader, StoreToast } from "./components/SiteChrome";
 import { StoreProvider } from "./components/StoreProvider";
 import { AuthProvider } from "./components/AuthProvider";
 import { AIChatbot } from "./components/AIChatbot";
@@ -36,15 +36,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="dns-prefetch" href="https://dapi.kakao.com" />
       </head>
       <body>
-        <StoreProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <StoreProvider>
             <SiteHeader />
             {children}
             <SiteFooter />
             <StoreToast />
             <AIChatbot />
-          </AuthProvider>
-        </StoreProvider>
+            <MobileNavigation />
+          </StoreProvider>
+        </AuthProvider>
       </body>
     </html>
   );

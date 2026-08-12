@@ -172,3 +172,81 @@ test("AI shopping assistant keeps Groq credentials in the relay only", async () 
   assert.match(worker, /CHAT_BUDGET_LIMITER/);
   assert.match(workflow, /NEXT_PUBLIC_CHATBOT_API_URL:\s*\$\{\{ vars\.CHATBOT_API_URL \}\}/);
 });
+
+test("account protects member details and exposes coupons and clear address actions", async () => {
+  const account = await readFile(resolve("app/account/page.tsx"), "utf8");
+  const provider = await readFile(resolve("app/components/AuthProvider.tsx"), "utf8");
+  const css = await readFile(resolve("app/globals.css"), "utf8");
+  assert.match(account, /id: "coupons", label: "쿠폰"/);
+  assert.match(account, /회원·보안 정보/);
+  assert.match(account, /본인 확인이 필요합니다/);
+  assert.match(account, /기본 배송지로 설정/);
+  assert.match(provider, /const verifyIdentity/);
+  assert.match(provider, /reauthenticateWithCredential/);
+  assert.match(provider, /reauthenticateWithPopup/);
+  assert.match(css, /\.address-card footer button \{[^}]*border:/s);
+});
+
+test("admin keeps editable hero history and persists member memo changes", async () => {
+  const admin = await readFile(resolve("app/admin/page.tsx"), "utf8");
+  const home = await readFile(resolve("app/page.tsx"), "utf8");
+  assert.match(admin, /메인 비주얼 게시 목록/);
+  assert.match(admin, /비주얼 추가/);
+  assert.match(admin, /메인에 사용/);
+  assert.match(admin, /노출 순서/);
+  assert.match(admin, /미사용·이력 보관/);
+  assert.match(admin, /localStorage\.setItem\("maison-admin-members"/);
+  assert.match(home, /filter\(\(slide\) => slide && slide\.active !== false\)/);
+  assert.match(home, /sort\(\(left, right\) => \(Number\(left\.order\)/);
+});
+
+test("store navigation is simplified and the event socks explain their purpose", async () => {
+  const chrome = await readFile(resolve("app/components/SiteChrome.tsx"), "utf8");
+  const catalog = await readFile(resolve("app/lib/products.ts"), "utf8");
+  assert.doesNotMatch(chrome, /Best Sellers <sup>/);
+  assert.doesNotMatch(chrome, /Editorial <sup>/);
+  assert.doesNotMatch(chrome, /Shop All/);
+  assert.match(chrome, />Shop<\/Link>/);
+  assert.match(catalog, /고객을 위한 특별 이벤트로 제작한 리미티드 리브 삭스/);
+});
+
+test("cart and wishlist require a signed-in member at every entry point", async () => {
+  const store = await readFile(resolve("app/components/StoreProvider.tsx"), "utf8");
+  const chrome = await readFile(resolve("app/components/SiteChrome.tsx"), "utf8");
+  const cart = await readFile(resolve("app/cart/page.tsx"), "utf8");
+  const wishlist = await readFile(resolve("app/wishlist/page.tsx"), "utf8");
+  const layout = await readFile(resolve("app/layout.tsx"), "utf8");
+  assert.match(store, /if \(!auth\.user\) \{ requireLogin\(\); return; \}/);
+  assert.match(store, /elan-cart-\$\{auth\.user\.uid\}/);
+  assert.match(store, /elan-wishlist-\$\{auth\.user\.uid\}/);
+  assert.match(store, /localStorage\.removeItem\("elan-cart"\)/);
+  assert.match(chrome, /!auth\.loading && auth\.user/);
+  assert.match(chrome, /auth\.user \? "쇼핑백" : "로그인"/);
+  assert.match(cart, /account\?returnTo=\/cart/);
+  assert.match(wishlist, /account\?returnTo=\/wishlist/);
+  assert.ok(layout.indexOf("<AuthProvider>") < layout.indexOf("<StoreProvider>"));
+});
+
+test("product detail keeps continuous anchored sections and purchase-gated reviews", async () => {
+  const detail = await readFile(resolve("app/product/[id]/ProductDetail.tsx"), "utf8");
+  const css = await readFile(resolve("app/globals.css"), "utf8");
+  assert.match(detail, /id="product-details"/);
+  assert.match(detail, /id="product-reviews"/);
+  assert.match(detail, /id="product-questions"/);
+  assert.match(detail, /scrollIntoView/);
+  assert.match(css, /\.feedback-tabs \{ position: sticky;/);
+  assert.match(detail, /purchasedProduct && <button className="feedback-write-button"/);
+});
+
+test("mobile navigation and admin operations remain reachable", async () => {
+  const chrome = await readFile(resolve("app/components/SiteChrome.tsx"), "utf8");
+  const admin = await readFile(resolve("app/admin/page.tsx"), "utf8");
+  const css = await readFile(resolve("app/globals.css"), "utf8");
+  assert.match(chrome, /className="mobile-bottom-nav"/);
+  assert.match(chrome, /className={`back-to-top/);
+  assert.match(admin, /뉴스레터 구독자/);
+  assert.match(admin, /메인 비주얼 게시 목록/);
+  assert.doesNotMatch(admin, /로컬 운영 데이터 자동 저장/);
+  assert.match(admin, /onOpen=\{openOrder\}/);
+  assert.match(css, /\.admin-table-head \{ display: none; \}/);
+});

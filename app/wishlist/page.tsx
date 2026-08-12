@@ -2,13 +2,20 @@
 
 import Link from "../components/StaticLink";
 import { Heart } from "lucide-react";
+import { useEffect } from "react";
 import { ProductCard } from "../components/ProductCard";
 import { useStore } from "../components/StoreProvider";
+import { useAuth } from "../components/AuthProvider";
 import { products } from "../lib/products";
 
 export default function WishlistPage() {
   const { wishlist } = useStore();
+  const auth = useAuth();
   const saved = products.filter((product) => wishlist.includes(product.id));
+  useEffect(() => {
+    if (!auth.loading && !auth.user) window.location.replace("/account?returnTo=/wishlist");
+  }, [auth.loading, auth.user]);
+  if (auth.loading || !auth.user) return <main id="content" className="inner-page utility-page"><section className="account-loading"><span /><p>로그인 화면으로 이동 중입니다.</p></section></main>;
   return (
     <main id="content" className="inner-page utility-page">
       <section className="utility-heading"><p className="eyebrow dark">YOUR EDIT</p><h1>Wishlist</h1><span>{saved.length} ITEMS</span></section>

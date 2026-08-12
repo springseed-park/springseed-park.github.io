@@ -47,7 +47,7 @@ function syncAdminCache(pending: PendingTossOrder, payment: PaymentInfo) {
         items: pending.items,
         amount: pending.amount,
         payment,
-        date: new Date().toLocaleString("ko-KR"),
+        date: new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(pending.createdAt)).replace(/\. /g, ".").replace(/\.$/, ""),
         status: "결제완료",
         courier: "",
         trackingNumber: "",

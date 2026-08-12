@@ -10,6 +10,7 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   reauthenticateWithCredential,
+  reauthenticateWithPopup,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -148,6 +149,7 @@ type AuthContextValue = {
   setDefaultAddress: (addressId: string) => Promise<void>;
   useCoupon: (couponId: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  verifyIdentity: (currentPassword?: string) => Promise<void>;
   createOrder: (order: NewOrder) => Promise<string | null>;
 };
 
@@ -207,6 +209,7 @@ export function firebaseErrorMessage(error: unknown) {
     "auth/too-many-requests": "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
     "auth/requires-recent-login": "보안을 위해 로그아웃 후 다시 로그인해 주세요.",
     "auth/wrong-password": "현재 비밀번호가 올바르지 않습니다.",
+    "auth/missing-password": "현재 비밀번호를 입력해 주세요.",
     "auth/operation-not-allowed": "현재 로그인 방식이 활성화되지 않았습니다. 관리자에게 문의해 주세요.",
     "auth/network-request-failed": "Google 로그인에 연결하지 못했습니다. 앱 내 브라우저라면 Chrome 또는 Safari에서 열거나 이메일 로그인을 이용해 주세요.",
     "auth/operation-not-supported-in-this-environment": "앱 내 브라우저에서는 Google 로그인이 제한될 수 있습니다. Chrome 또는 Safari에서 열거나 이메일 로그인을 이용해 주세요.",
@@ -252,6 +255,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile(fallback);
     }
   }), []);
+
+  useEffect(() => {
+    if (!user || !profile?.email) return;
+    let syncing = false;
+    const syncIssuedCoupons = async () => {
+      if (syncing) return;
+      syncing = true;
+      try {
+        type CouponIssue = { issueId: string; email: string; coupon: MemberCoupon; status: "대기" | "지급완료" };
+        const issues = JSON.parse(localStorage.getItem("maison-admin-coupon-issues") || "[]") as CouponIssue[];
+        const pending = issues.filter((issue) => issue.status === "대기" && issue.email.toLocaleLowerCase() === profile.email.toLocaleLowerCase());
+        if (!pending.length) return;
+        const issuedIds = new Set(profile.coupons.map((coupon) => coupon.id));
+        const newCoupons = pending.map((issue) => issue.coupon).filter((coupon) => !issuedIds.has(coupon.id));
+        const coupons = [...newCoupons, ...profile.coupons];
+        if (newCoupons.length) {
+          await setDoc(doc(firestore, "users", user.uid), { coupons, updatedAt: serverTimestamp() }, { merge: true });
+          setProfile({ ...profile, coupons });
+        }
+        const completedIds = new Set(pending.map((issue) => issue.issueId));
+        localStorage.setItem("maison-admin-coupon-issues", JSON.stringify(issues.map((issue) => completedIds.has(issue.issueId) ? { ...issue, status: "지급완료" } : issue)));
+      } catch { /* keep pending issues for the next signed-in session */ }
+      finally { syncing = false; }
+    };
+    void syncIssuedCoupons();
+    const syncFromAdmin = () => void syncIssuedCoupons();
+    window.addEventListener("maison-coupon-issued", syncFromAdmin);
+    return () => window.removeEventListener("maison-coupon-issued", syncFromAdmin);
+  }, [profile, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -382,6 +414,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
     await updatePassword(user, newPassword);
   };
+  const verifyIdentity = async (currentPassword = "") => {
+    if (!user) return;
+    const isPasswordUser = user.providerData.some((provider) => provider.providerId === "password");
+    if (isPasswordUser) {
+      if (!user.email || !currentPassword) throw Object.assign(new Error("비밀번호를 입력해 주세요."), { code: "auth/missing-password" });
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
+      return;
+    }
+    await reauthenticateWithPopup(user, googleProvider, browserPopupRedirectResolver);
+  };
   const createOrder = async (order: NewOrder) => {
     if (!user) return null;
     if (!/^[A-Za-z0-9_-]{8,80}$/.test(order.orderNumber)) throw new Error("invalid-order-number");
@@ -390,7 +432,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return orderRef.id;
   };
 
-  const value = { user, profile, orders, loading, authError, signIn, signUp, signInWithGoogle, resetPassword, logout, saveProfile, saveAddress, deleteAddress, setDefaultAddress, useCoupon, changePassword, createOrder };
+  const value = { user, profile, orders, loading, authError, signIn, signUp, signInWithGoogle, resetPassword, logout, saveProfile, saveAddress, deleteAddress, setDefaultAddress, useCoupon, changePassword, verifyIdentity, createOrder };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

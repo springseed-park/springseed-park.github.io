@@ -2,6 +2,7 @@
 
 import Link from "../components/StaticLink";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { useEffect } from "react";
 import { useStore } from "../components/StoreProvider";
 import { useAuth } from "../components/AuthProvider";
 import { formatPrice, getProduct } from "../lib/products";
@@ -10,6 +11,10 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, updateCartColor } = useStore();
   const auth = useAuth();
   const subtotal = cart.reduce((total, line) => total + getProduct(line.id).price * line.quantity, 0);
+  useEffect(() => {
+    if (!auth.loading && !auth.user) window.location.replace("/account?returnTo=/cart");
+  }, [auth.loading, auth.user]);
+  if (auth.loading || !auth.user) return <main id="content" className="inner-page utility-page cart-page"><section className="account-loading"><span /><p>로그인 화면으로 이동 중입니다.</p></section></main>;
   return (
     <main id="content" className="inner-page utility-page cart-page">
       <section className="utility-heading"><p className="eyebrow dark">YOUR SELECTION</p><h1>Shopping Bag</h1><span>{cart.reduce((total, line) => total + line.quantity, 0)} ITEMS</span></section>
