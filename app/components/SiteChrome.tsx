@@ -20,13 +20,11 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
-  useEffect(() => setMenuOpen(false), [pathname]);
-
   return (
     <>
       <a className="skip-link" href="#content">본문으로 바로가기</a>
       <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${!isHome ? "inner-header" : ""}`}>
-        <button className="header-icon mobile-menu-button" type="button" onClick={() => setMenuOpen(true)} aria-label="메뉴 열기"><Menu size={22} strokeWidth={1.4} /></button>
+        <button className="header-icon mobile-menu-button" type="button" onClick={() => setMenuOpen(true)} aria-label="메뉴 열기" aria-expanded={menuOpen} aria-controls="mobile-menu-drawer"><Menu size={22} strokeWidth={1.4} /></button>
         <nav className="desktop-nav" aria-label="주요 메뉴">
           <Link href="/#best">BEST</Link><Link href="/shop">SHOP</Link><Link href="/editorial">EDITORIAL</Link>
         </nav>
@@ -40,14 +38,14 @@ export function SiteHeader() {
           <Link href="/cart" aria-label={`장바구니 상품 ${cartCount}개`}><ShoppingBag size={20} strokeWidth={1.35} /><span className="icon-badge">{cartCount}</span></Link>
         </nav>
       </header>
-      <aside className={`menu-drawer ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>
+      <aside id="mobile-menu-drawer" className={`menu-drawer ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen} inert={!menuOpen ? true : undefined}>
         <button className="drawer-close" type="button" onClick={() => setMenuOpen(false)} aria-label="메뉴 닫기"><X size={25} strokeWidth={1.3} /></button>
         <img className="drawer-brand-symbol" src="/maison-elan-symbol.svg" alt="" aria-hidden="true" />
         <p className="eyebrow">MENU / 2026</p>
         <nav aria-label="모바일 메뉴">
-          <Link href="/#best">Best Sellers <sup>08</sup></Link><Link href="/shop">Shop All</Link><Link href="/editorial">Editorial <sup>08</sup></Link>
+          <Link href="/#best" onClick={() => setMenuOpen(false)}>Best Sellers <sup>08</sup></Link><Link href="/shop" onClick={() => setMenuOpen(false)}>Shop All</Link><Link href="/editorial" onClick={() => setMenuOpen(false)}>Editorial <sup>08</sup></Link><Link href="/search" onClick={() => setMenuOpen(false)}>Search</Link>
         </nav>
-        <div className="drawer-meta"><Link href="/account">Account</Link><Link href="/wishlist">Wishlist ({wishlist.length})</Link><p>Seoul · KRW</p></div>
+        <div className="drawer-meta"><Link href="/account" onClick={() => setMenuOpen(false)}>로그인 · 마이페이지</Link><Link href="/wishlist" onClick={() => setMenuOpen(false)}>Wishlist ({wishlist.length})</Link><p>Seoul · KRW</p></div>
       </aside>
       <button className={`page-scrim ${menuOpen ? "is-visible" : ""}`} type="button" onClick={() => setMenuOpen(false)} aria-label="메뉴 닫기" tabIndex={menuOpen ? 0 : -1} />
     </>

@@ -67,10 +67,10 @@ export default function GoogleSignInButton() {
         client_id: googleOAuthClientId,
         auto_select: false,
         cancel_on_tap_outside: true,
-        // The embedded local preview does not reliably expose the browser's
-        // FedCM account chooser. GIS popup mode opens directly from the user's
-        // click and still returns the ID token without a Firebase redirect.
-        use_fedcm_for_button: false,
+        // GitHub Pages cannot attach the COOP response header required by the
+        // legacy cross-window popup flow. FedCM lets the browser mediate the
+        // account chooser without that opener channel or third-party cookies.
+        use_fedcm_for_button: true,
         button_auto_select: false,
         callback: ({ credential }) => {
           if (!credential) {

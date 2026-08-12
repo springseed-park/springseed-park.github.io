@@ -75,3 +75,14 @@ test("static Pages build does not use client-side Next links", async () => {
   }
   assert.deepEqual(offenders, []);
 });
+
+test("mobile header keeps the account entry point visible", async () => {
+  const css = await readFile(resolve("app/globals.css"), "utf8");
+  assert.match(css, /\.icon-utilities a:nth-child\(1\), \.icon-utilities a:nth-child\(3\) \{ display: none; \}/);
+  assert.doesNotMatch(css, /\.icon-utilities a:nth-child\(2\)[^{]*\{ display: none; \}/);
+});
+
+test("Google sign-in uses the FedCM button flow on static hosting", async () => {
+  const source = await readFile(resolve("app/components/GoogleSignInButton.tsx"), "utf8");
+  assert.match(source, /use_fedcm_for_button:\s*true/);
+});

@@ -1219,7 +1219,7 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
   .brand-mark { width: 164px; }
   .header-utilities { justify-content: flex-end; }
   .icon-utilities { gap: 8px; }
-  .icon-utilities a:nth-child(2), .icon-utilities a:nth-child(3) { display: none; }
+  .icon-utilities a:nth-child(1), .icon-utilities a:nth-child(3) { display: none; }
   .icon-badge { top: 1px; right: -1px; }
   .hero { min-height: 620px; height: 100svh; }
   .hero::before { background: linear-gradient(180deg, rgba(8,3,5,.17) 0%, rgba(8,3,5,.02) 36%, rgba(8,3,5,.22) 54%, rgba(8,3,5,.87) 100%); }
