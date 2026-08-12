@@ -647,10 +647,13 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .form-grid label, .login-layout form > label { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
 .form-grid label.full { grid-column: 1 / -1; }
 .form-grid input, .form-grid select, .login-layout input { height: 48px; padding: 0 13px; border: 1px solid var(--line); border-radius: 0; outline: 0; background: transparent; font-size: 14px; }
-.input-action { display: grid; grid-template-columns: 1fr 110px; }
+.input-action { display: grid; grid-template-columns: 1fr 145px; }
 .input-action button { display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; color: white; background: var(--ink); cursor: pointer; font-size: 13px; }
 .input-action button svg { width: 15px; height: 15px; }
 .postcode-action input { min-width: 0; }
+.postcode-action button { position: relative; color: #191919; background: #fee500; font-weight: 600; }
+.postcode-action button::before { content: "K"; width: 19px; height: 19px; display: grid; place-items: center; border-radius: 50%; color: #fee500; background: #191919; font-size: 11px; font-weight: 700; }
+.postcode-action button svg { display: none; }
 .form-section-label { grid-column: 1 / -1; margin: 8px 0 -8px; padding-top: 22px; border-top: 1px solid var(--line); color: #716a64; font-size: 13px; letter-spacing: .12em; }
 .postcode-backdrop { position: fixed; z-index: 1200; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(18,16,14,.58); backdrop-filter: blur(5px); }
 .postcode-dialog { width: min(560px, 100%); max-height: calc(100svh - 48px); overflow: auto; padding: 25px; border: 1px solid rgba(255,255,255,.25); background: var(--ivory); box-shadow: 0 28px 80px rgba(0,0,0,.2); }
@@ -664,6 +667,8 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .postcode-loading, .postcode-error { min-height: 180px; display: grid; place-items: center; padding: 25px; color: #736c65; background: white; font-size: 13px; text-align: center; }
 .postcode-loading + .postcode-embed, .postcode-error + .postcode-embed { display: none; }
 .postcode-error button { min-width: 110px; min-height: 42px; border: 1px solid var(--ink); background: transparent; cursor: pointer; }
+.postcode-provider { display: flex; align-items: center; justify-content: flex-end; gap: 7px; margin: 13px 0 0; color: #625d57; font-size: 13px; }
+.postcode-provider span { width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; color: #191919; background: #fee500; font-size: 11px; font-weight: 700; }
 .checkout-auth-page { background: #f1ede6; }
 .checkout-auth-gate { min-height: calc(100svh - 68px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; }
 .checkout-auth-gate > span { width: 70px; height: 70px; display: grid; place-items: center; margin-bottom: 30px; border: 1px solid var(--ink); border-radius: 50%; }

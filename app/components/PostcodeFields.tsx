@@ -1,14 +1,17 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { MemberAddress } from "./AuthProvider";
 
 type PostcodeResult = {
   zonecode: string;
   userSelectedType: "R" | "J";
+  address: string;
   roadAddress: string;
   jibunAddress: string;
+  autoRoadAddress: string;
+  autoJibunAddress: string;
   bname: string;
   buildingName: string;
   apartment: "Y" | "N";
@@ -20,6 +23,10 @@ type PostcodeConstructor = new (options: {
   width?: string;
   height?: string;
   maxSuggestItems?: number;
+  autoMapping?: boolean;
+  shorthand?: boolean;
+  hideMapBtn?: boolean;
+  hideEngBtn?: boolean;
 }) => { embed: (element: HTMLElement) => void };
 
 declare global {
@@ -30,9 +37,15 @@ declare global {
 }
 
 const postcodeScriptId = "kakao-postcode-service";
+const postcodeScriptSrc = "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+let postcodeScriptPromise: Promise<PostcodeConstructor> | null = null;
 
 function loadPostcodeScript() {
-  return new Promise<PostcodeConstructor>((resolve, reject) => {
+  const ready = window.kakao?.Postcode ?? window.daum?.Postcode;
+  if (ready) return Promise.resolve(ready);
+  if (postcodeScriptPromise) return postcodeScriptPromise;
+
+  postcodeScriptPromise = new Promise<PostcodeConstructor>((resolve, reject) => {
     const ready = window.kakao?.Postcode ?? window.daum?.Postcode;
     if (ready) {
       resolve(ready);
@@ -43,8 +56,9 @@ function loadPostcodeScript() {
     if (!script) {
       script = document.createElement("script");
       script.id = postcodeScriptId;
-      script.src = "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.src = postcodeScriptSrc;
       script.async = true;
+      script.dataset.provider = "kakao-postcode";
       document.head.appendChild(script);
     }
 
@@ -59,7 +73,12 @@ function loadPostcodeScript() {
     };
     script.addEventListener("load", handleLoad, { once: true });
     script.addEventListener("error", handleError, { once: true });
+  }).catch((error) => {
+    postcodeScriptPromise = null;
+    throw error;
   });
+
+  return postcodeScriptPromise;
 }
 
 type PostcodeFieldsProps = {
@@ -91,7 +110,10 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
         embedRoot.current.replaceChildren();
         new Postcode({
           oncomplete: (data) => {
-            let address = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+            const roadAddress = data.roadAddress || data.autoRoadAddress;
+            const jibunAddress = data.jibunAddress || data.autoJibunAddress;
+            let address = data.userSelectedType === "R" ? roadAddress : jibunAddress;
+            address ||= data.address || roadAddress || jibunAddress;
             if (data.userSelectedType === "R") {
               const extra: string[] = [];
               if (data.bname && /[동로가]$/.test(data.bname)) extra.push(data.bname);
@@ -109,9 +131,13 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
           width: "100%",
           height: "100%",
           maxSuggestItems: 5,
+          autoMapping: true,
+          shorthand: false,
+          hideMapBtn: true,
+          hideEngBtn: true,
         }).embed(embedRoot.current);
       })
-      .catch(() => setError("주소 검색 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."))
+      .catch(() => setError("카카오 주소 검색 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."))
       .finally(() => setLoading(false));
 
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -131,7 +157,7 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
         우편번호
         <span className="input-action postcode-action">
           <input name="postalCode" required value={postalCode} readOnly placeholder="우편번호" />
-          <button type="button" onClick={() => setOpen(true)}><Search />주소 검색</button>
+          <button type="button" onPointerEnter={() => void loadPostcodeScript().catch(() => undefined)} onFocus={() => void loadPostcodeScript().catch(() => undefined)} onClick={() => setOpen(true)}>카카오 주소검색</button>
         </span>
       </label>
       <label className="full">
@@ -145,11 +171,12 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
 
       {open && <div className="postcode-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
         <section className="postcode-dialog" role="dialog" aria-modal="true" aria-labelledby="postcode-title">
-          <header><div><p>DELIVERY ADDRESS</p><h2 id="postcode-title">우편번호 검색</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="주소 검색 닫기"><X /></button></header>
+          <header><div><p>KAKAO ADDRESS</p><h2 id="postcode-title">카카오 우편번호 검색</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="주소 검색 닫기"><X /></button></header>
           <p className="postcode-guide">도로명, 건물명 또는 지번을 입력한 뒤 주소를 선택해 주세요.</p>
-          {loading && <div className="postcode-loading">주소 검색을 불러오는 중입니다.</div>}
-          {error && <div className="postcode-error"><p>{error}</p><button type="button" onClick={() => { setOpen(false); window.setTimeout(() => setOpen(true), 0); }}>다시 시도</button></div>}
+          {loading && <div className="postcode-loading" role="status">카카오 주소 검색을 불러오는 중입니다.</div>}
+          {error && <div className="postcode-error" role="alert"><p>{error}</p><button type="button" onClick={() => { setOpen(false); window.setTimeout(() => setOpen(true), 0); }}>다시 시도</button></div>}
           <div className="postcode-embed" ref={embedRoot} />
+          <p className="postcode-provider"><span>K</span>Kakao 우편번호 서비스</p>
         </section>
       </div>}
     </>
