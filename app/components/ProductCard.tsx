@@ -3,7 +3,7 @@
 import Link from "./StaticLink";
 import { Heart, Plus, ShoppingBag } from "lucide-react";
 import { useState } from "react";
-import { formatPrice, Product } from "../lib/products";
+import { formatPrice, Product, productDetailHref } from "../lib/products";
 import { useStore } from "./StoreProvider";
 
 export function ColorSwatches({ colors, compact = false, selected, onSelect }: { colors: Product["colors"]; compact?: boolean; selected?: string; onSelect?: (color: Product["colors"][number]) => void }) {
@@ -26,7 +26,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   return (
     <article className="product-card">
       <div className="product-media">
-        <Link href={`/product/${product.id}`} aria-label={`${product.name} 상세 보기`}>
+        <Link href={productDetailHref(product.id)} aria-label={`${product.name} 상세 보기`}>
           <img key={selectedColor.image} src={selectedColor.image} alt={`${product.name}, ${selectedColor.name} 색상 착용 이미지`} loading={priority ? "eager" : "lazy"} />
         </Link>
         {product.label && <span className={`product-label ${product.label === "SALE" ? "is-sale" : ""}`}>{product.label}</span>}
@@ -37,7 +37,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       <div className="product-meta">
         <div>
           <p className="product-category">{product.category}</p>
-          <h3><Link href={`/product/${product.id}`}>{product.name}</Link></h3>
+          <h3><Link href={productDetailHref(product.id)}>{product.name}</Link></h3>
           <p className="product-review-count"><span aria-hidden="true">★</span> {product.rating.toFixed(1)} <em>({product.reviewCount})</em></p>
         </div>
         <div className={`product-price ${product.originalPrice ? "is-sale" : ""}`}>{product.originalPrice && <del>{formatPrice(product.originalPrice)}</del>}<p>{formatPrice(product.price)}</p></div>

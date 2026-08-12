@@ -7,7 +7,7 @@ import Link from "../components/StaticLink";
 import { MemberCoupon, useAuth } from "../components/AuthProvider";
 import PostcodeFields from "../components/PostcodeFields";
 import { useStore } from "../components/StoreProvider";
-import { formatPrice, getProduct } from "../lib/products";
+import { formatPrice, getProduct, productDetailHref } from "../lib/products";
 import {
   TOSS_PENDING_ORDER_KEY,
   TOSS_WIDGET_CLIENT_KEY,
@@ -217,12 +217,12 @@ export default function CheckoutPage() {
   if (auth.loading || !checkoutReady) return <main id="content" className="inner-page utility-page"><section className="account-loading"><span /><p>회원 정보를 확인하는 중입니다.</p></section></main>;
   if (!auth.user) {
     const returnTo = isBuyNow ? "/checkout?mode=buy-now" : "/checkout";
-    return <main id="content" className="inner-page utility-page checkout-auth-page"><section className="checkout-auth-gate"><span><LogIn /></span><p className="eyebrow dark">MEMBER CHECKOUT</p><h1>로그인 후<br />주문할 수 있어요.</h1><p>{isBuyNow ? "선택한 상품은 그대로 보관됩니다." : "쇼핑백의 상품은 그대로 보관됩니다."}<br />로그인하면 회원 정보와 기본 배송지를 자동으로 채워드려요.</p><div><Link className="primary-button" href={`/account?returnTo=${encodeURIComponent(returnTo)}`}>로그인·회원가입</Link><Link className="secondary-button" href={isBuyNow && buyNowLine ? `/product/${buyNowLine.id}` : "/cart"}>{isBuyNow ? "상품으로 돌아가기" : "쇼핑백으로 돌아가기"}</Link></div><small><PackageCheck />주문 내역과 배송 상태는 마이페이지에서 확인할 수 있습니다.</small></section></main>;
+    return <main id="content" className="inner-page utility-page checkout-auth-page"><section className="checkout-auth-gate"><span><LogIn /></span><p className="eyebrow dark">MEMBER CHECKOUT</p><h1>로그인 후<br />주문할 수 있어요.</h1><p>{isBuyNow ? "선택한 상품은 그대로 보관됩니다." : "쇼핑백의 상품은 그대로 보관됩니다."}<br />로그인하면 회원 정보와 기본 배송지를 자동으로 채워드려요.</p><div><Link className="primary-button" href={`/account?returnTo=${encodeURIComponent(returnTo)}`}>로그인·회원가입</Link><Link className="secondary-button" href={isBuyNow && buyNowLine ? productDetailHref(buyNowLine.id) : "/cart"}>{isBuyNow ? "상품으로 돌아가기" : "쇼핑백으로 돌아가기"}</Link></div><small><PackageCheck />주문 내역과 배송 상태는 마이페이지에서 확인할 수 있습니다.</small></section></main>;
   }
 
   return (
     <main id="content" className="inner-page checkout-page">
-      <div className="checkout-title"><Link href={isBuyNow && buyNowLine ? `/product/${buyNowLine.id}` : "/cart"}><ChevronLeft size={18} />{isBuyNow ? "상품으로 돌아가기" : "쇼핑백으로 돌아가기"}</Link><h1>Checkout</h1><span><LockKeyhole size={15} /> SECURE</span></div>
+      <div className="checkout-title"><Link href={isBuyNow && buyNowLine ? productDetailHref(buyNowLine.id) : "/cart"}><ChevronLeft size={18} />{isBuyNow ? "상품으로 돌아가기" : "쇼핑백으로 돌아가기"}</Link><h1>Checkout</h1><span><LockKeyhole size={15} /> SECURE</span></div>
       <form className="checkout-layout" onSubmit={submit}>
         <div className="checkout-form">
           <fieldset><legend><span>01</span>주문자 정보</legend><div className="form-grid"><label>이름<input name="name" required defaultValue={auth.profile?.displayName} placeholder="홍길동" /></label><label>연락처<input name="phone" required type="tel" defaultValue={auth.profile?.phone} placeholder="010-0000-0000" /></label><label className="full">이메일<input name="email" required type="email" defaultValue={auth.user.email ?? ""} placeholder="email@example.com" /></label></div></fieldset>

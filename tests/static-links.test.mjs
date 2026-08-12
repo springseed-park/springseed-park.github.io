@@ -113,6 +113,19 @@ test("limited socks product and every supplied color image are exported", async 
   }
 });
 
+test("administrator-added products use the static shared detail screen and support image attachments", async () => {
+  const productCard = await readFile(resolve("app/components/ProductCard.tsx"), "utf8");
+  const detail = await readFile(resolve("app/product/[id]/RuntimeProductDetail.tsx"), "utf8");
+  const admin = await readFile(resolve("app/admin/page.tsx"), "utf8");
+  const products = await readFile(resolve("app/lib/products.ts"), "utf8");
+  assert.equal(await exists(await resolveOutputFile("/product")), true);
+  assert.match(products, /productDetailHref/);
+  assert.match(productCard, /href=\{productDetailHref\(product\.id\)\}/);
+  assert.match(detail, /new URLSearchParams\(window\.location\.search\)\.get\("product"\)/);
+  assert.match(admin, /type="file"/);
+  assert.match(admin, /raw\.githubusercontent\.com/);
+});
+
 test("account sign-in keeps only the centered authentication panel", async () => {
   const account = await readFile(resolve("app/account/page.tsx"), "utf8");
   const css = await readFile(resolve("app/globals.css"), "utf8");

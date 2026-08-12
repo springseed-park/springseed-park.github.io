@@ -1233,6 +1233,10 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .admin-product-preview { width: 115px; margin-top: 18px; }
 .admin-product-preview img { width: 115px; height: 145px; object-fit: cover; }
 .admin-product-preview span { display: block; margin-top: 7px; color: #777069; font-size: 13px; }
+.admin-image-upload { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.admin-image-upload input[type="file"] { min-width: 0; padding: 8px 0; border: 0; background: transparent; }
+.admin-image-upload small { color: #777069; font-size: 11px; line-height: 1.4; }
+.admin-image-error { margin: 12px 0 0; color: #a13545; font-size: 13px; }
 .admin-editor-form > footer { position: sticky; bottom: 0; display: flex; justify-content: flex-end; padding: 19px 38px; border-top: 1px solid var(--line); background: rgba(247,244,238,.95); backdrop-filter: blur(8px); }
 .admin-order-customer { display: flex; align-items: center; gap: 16px; }
 .admin-order-customer > span { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--wine); }

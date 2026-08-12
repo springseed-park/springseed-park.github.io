@@ -217,6 +217,12 @@ export const products: Product[] = [
 
 export const formatPrice = (price: number) => `₩${price.toLocaleString("ko-KR")}`;
 
+/**
+ * GitHub Pages can only pre-render product paths known at build time. The
+ * shared product screen keeps administrator-added products reachable too.
+ */
+export const productDetailHref = (id: string) => `/product?product=${encodeURIComponent(id)}`;
+
 export const getProduct = (id: string) => {
   if (typeof window !== "undefined") {
     try {
