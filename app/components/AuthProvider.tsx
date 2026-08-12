@@ -19,7 +19,6 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
@@ -95,8 +94,27 @@ export type PaymentInfo = {
   shippingFee: number;
   paidAmount: number;
   method: string;
+  /** Toss Payments payment identifier returned after server-side approval. */
+  paymentKey?: string;
+  /** Merchant order ID sent to Toss Payments. */
+  orderId?: string;
+  /** Toss payment status, for example DONE. */
+  status?: string;
+  /** ISO timestamp returned by Toss Payments after approval. */
+  approvedAt?: string;
+  /** Customer-facing Toss receipt URL. */
+  receiptUrl?: string;
+  /** Easy-pay provider returned by Toss Payments, if applicable. */
+  easyPayProvider?: string;
+  /** Payment gateway shown in the order history. */
+  provider?: string;
   cardCompany?: string;
+  cardNumber?: string;
   cardLast4?: string;
+  cardType?: string;
+  cardOwnerType?: string;
+  installmentPlanMonths?: number;
+  isInterestFree?: boolean;
   couponName?: string;
   couponCode?: string;
   paidAt?: string;
@@ -366,7 +384,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   const createOrder = async (order: NewOrder) => {
     if (!user) return null;
-    const orderRef = await addDoc(collection(firestore, "users", user.uid, "orders"), { ...order, createdAt: serverTimestamp() });
+    if (!/^[A-Za-z0-9_-]{8,80}$/.test(order.orderNumber)) throw new Error("invalid-order-number");
+    const orderRef = doc(collection(firestore, "users", user.uid, "orders"), order.orderNumber);
+    await setDoc(orderRef, { ...order, createdAt: serverTimestamp() });
     return orderRef.id;
   };
 

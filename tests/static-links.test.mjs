@@ -90,3 +90,8 @@ test("Google sign-in uses Firebase popup auth on static hosting", async () => {
   assert.match(firebase, /popupRedirectResolver:\s*browserPopupRedirectResolver/);
   assert.doesNotMatch(button, /use_fedcm_for_button/);
 });
+
+test("Toss redirect result pages are included in the static Pages build", async () => {
+  assert.equal(await exists(await resolveOutputFile("/payment/success")), true);
+  assert.equal(await exists(await resolveOutputFile("/payment/fail")), true);
+});
