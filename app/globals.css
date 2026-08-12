@@ -948,6 +948,28 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
 .support-copy dl > div { display: grid; grid-template-columns: 140px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--line); }
 .support-copy dt { color: #777069; font-size: 13px; }
 .support-copy dd { margin: 0; font-size: 14px; }
+.showroom-card { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(270px, .72fr); min-height: 510px; overflow: hidden; border: 1px solid var(--line); background: var(--paper); }
+.showroom-map { position: relative; min-height: 510px; overflow: hidden; background: #d8d3ca; }
+.showroom-map-canvas { width: 100%; height: 100%; position: absolute; inset: 0; filter: grayscale(.72) sepia(.1) contrast(.92); }
+.showroom-map::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(31,27,24,.08); }
+.showroom-map-label { position: absolute; z-index: 2; left: 22px; bottom: 22px; padding: 11px 14px; color: white; background: rgba(28,24,21,.88); backdrop-filter: blur(8px); opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; font-size: 13px; letter-spacing: .12em; }
+.showroom-map-label.is-ready { opacity: 1; transform: none; }
+.showroom-map-state { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; padding: 30px; color: #625b54; background: #d8d3ca; font-size: 13px; text-align: center; }
+.showroom-map-state p { margin: 0; }
+.showroom-map-state a { padding-bottom: 4px; border-bottom: 1px solid; color: var(--ink); }
+.showroom-details { display: flex; flex-direction: column; padding: 39px 34px 32px; color: #eee9e2; background: var(--ink); }
+.showroom-details .eyebrow { color: #a9a19a; }
+.showroom-details h3 { margin: 20px 0 28px; font: 400 clamp(33px, 3vw, 48px)/1 var(--font-serif); }
+.showroom-details address { padding: 24px 0; border-top: 1px solid rgba(255,255,255,.16); border-bottom: 1px solid rgba(255,255,255,.16); font-size: 14px; font-style: normal; line-height: 1.85; }
+.showroom-details address span { display: block; color: #9d958e; font-size: 13px; letter-spacing: .12em; }
+.showroom-details dl { margin: 22px 0 28px; }
+.showroom-details dl > div { display: grid; grid-template-columns: 85px 1fr; gap: 12px; margin: 10px 0; }
+.showroom-details dt { color: #9d958e; font-size: 13px; }
+.showroom-details dd { margin: 0; font-size: 13px; }
+.showroom-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: auto; }
+.showroom-actions a { min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid rgba(255,255,255,.35); font-size: 13px; }
+.showroom-actions a:first-child { color: #1d1a17; border-color: #f5e000; background: #f5e000; }
+.showroom-actions svg { width: 15px; height: 15px; }
 .support-guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .support-guide-grid article { min-height: 290px; padding: 38px; background: var(--paper); }
 .support-guide-grid h3 { margin: 55px 0 18px; font: 400 30px var(--font-serif); }
@@ -1182,6 +1204,7 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
   .overview-cards button { min-height: 160px; }
   .footer-links { grid-template-columns: repeat(2, 1fr); }
   .support-section { grid-template-columns: 1fr; gap: 45px; }
+  .showroom-card { grid-template-columns: minmax(0, 1.25fr) minmax(270px, .75fr); }
   .admin-shell { display: block; }
   .admin-sidebar { position: static; width: 100%; height: auto; padding: 22px; }
   .admin-sidebar nav { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 20px; }
@@ -1488,6 +1511,9 @@ footer { position: relative; padding: 70px 4.2vw 25px; color: #d9d3cc; backgroun
   .support-guide-grid { grid-template-columns: 1fr; }
   .support-guide-grid article { min-height: 250px; padding: 30px; }
   .support-copy dl > div { grid-template-columns: 1fr; gap: 8px; }
+  .showroom-card { grid-template-columns: 1fr; }
+  .showroom-map { min-height: 380px; }
+  .showroom-details { min-height: 410px; padding: 30px 24px 24px; }
   .admin-sidebar nav { grid-template-columns: 1fr 1fr; }
   .admin-sidebar nav button { min-height: 43px; }
   .admin-topbar { min-height: 135px; padding: 30px 18px 24px; }

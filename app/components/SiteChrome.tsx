@@ -61,7 +61,7 @@ export function SiteFooter() {
       <div className="footer-top">
         <Link className="footer-brand" href="/" aria-label="Maison Élan 홈"><img src="/maison-elan-logo.png" alt="" /></Link>
         <div className="footer-links">
-          <div><p>CLIENT SERVICE</p><Link href="/support#contact">Contact</Link><Link href="/support#delivery">Delivery & Returns</Link><Link href="/support#size-guide">Size Guide</Link></div>
+          <div><p>CLIENT SERVICE</p><Link href="/support#contact">Contact</Link><Link href="/support#visit">Visit Seoul</Link><Link href="/support#delivery">Delivery & Returns</Link><Link href="/support#size-guide">Size Guide</Link></div>
           <div><p>ABOUT</p><Link href="/editorial/between-light-and-form">Our Story</Link><Link href="/editorial">Journal</Link><Link href="/editorial#archive">Issue Archive</Link></div>
           <div><p>FOLLOW</p><a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a><a href="https://www.pinterest.com/" target="_blank" rel="noreferrer">Pinterest</a><a href="mailto:client@maisonelan.kr">Email</a></div>
           <div><p>MANAGEMENT</p><Link href="/admin">Administrator</Link></div>

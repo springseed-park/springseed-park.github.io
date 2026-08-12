@@ -4,48 +4,16 @@ import { Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { MemberAddress } from "./AuthProvider";
 
-type PostcodeResult = {
-  zonecode: string;
-  userSelectedType: "R" | "J";
-  address: string;
-  roadAddress: string;
-  jibunAddress: string;
-  autoRoadAddress: string;
-  autoJibunAddress: string;
-  bname: string;
-  buildingName: string;
-  apartment: "Y" | "N";
-};
-
-type PostcodeConstructor = new (options: {
-  oncomplete: (data: PostcodeResult) => void;
-  onresize?: (size: { height: number }) => void;
-  width?: string;
-  height?: string;
-  maxSuggestItems?: number;
-  autoMapping?: boolean;
-  shorthand?: boolean;
-  hideMapBtn?: boolean;
-  hideEngBtn?: boolean;
-}) => { embed: (element: HTMLElement) => void };
-
-declare global {
-  interface Window {
-    daum?: { Postcode?: PostcodeConstructor };
-    kakao?: { Postcode?: PostcodeConstructor };
-  }
-}
-
 const postcodeScriptId = "kakao-postcode-service";
 const postcodeScriptSrc = "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-let postcodeScriptPromise: Promise<PostcodeConstructor> | null = null;
+let postcodeScriptPromise: Promise<KakaoPostcodeConstructor> | null = null;
 
 function loadPostcodeScript() {
   const ready = window.kakao?.Postcode ?? window.daum?.Postcode;
   if (ready) return Promise.resolve(ready);
   if (postcodeScriptPromise) return postcodeScriptPromise;
 
-  postcodeScriptPromise = new Promise<PostcodeConstructor>((resolve, reject) => {
+  postcodeScriptPromise = new Promise<KakaoPostcodeConstructor>((resolve, reject) => {
     const ready = window.kakao?.Postcode ?? window.daum?.Postcode;
     if (ready) {
       resolve(ready);
