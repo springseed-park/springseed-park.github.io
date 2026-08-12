@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { MemberAddress } from "./AuthProvider";
 
@@ -137,7 +137,7 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
           hideEngBtn: true,
         }).embed(embedRoot.current);
       })
-      .catch(() => setError("카카오 주소 검색 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."))
+      .catch(() => setError("주소 검색 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."))
       .finally(() => setLoading(false));
 
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -157,7 +157,7 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
         우편번호
         <span className="input-action postcode-action">
           <input name="postalCode" required value={postalCode} readOnly placeholder="우편번호" />
-          <button type="button" onPointerEnter={() => void loadPostcodeScript().catch(() => undefined)} onFocus={() => void loadPostcodeScript().catch(() => undefined)} onClick={() => setOpen(true)}>카카오 주소검색</button>
+          <button type="button" onPointerEnter={() => void loadPostcodeScript().catch(() => undefined)} onFocus={() => void loadPostcodeScript().catch(() => undefined)} onClick={() => setOpen(true)}><Search />주소 검색</button>
         </span>
       </label>
       <label className="full">
@@ -171,12 +171,11 @@ export default function PostcodeFields({ initial, detailRequired = false }: Post
 
       {open && <div className="postcode-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
         <section className="postcode-dialog" role="dialog" aria-modal="true" aria-labelledby="postcode-title">
-          <header><div><p>KAKAO ADDRESS</p><h2 id="postcode-title">카카오 우편번호 검색</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="주소 검색 닫기"><X /></button></header>
+          <header><div><p>DELIVERY ADDRESS</p><h2 id="postcode-title">주소 검색</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="주소 검색 닫기"><X /></button></header>
           <p className="postcode-guide">도로명, 건물명 또는 지번을 입력한 뒤 주소를 선택해 주세요.</p>
-          {loading && <div className="postcode-loading" role="status">카카오 주소 검색을 불러오는 중입니다.</div>}
+          {loading && <div className="postcode-loading" role="status">주소 검색을 불러오는 중입니다.</div>}
           {error && <div className="postcode-error" role="alert"><p>{error}</p><button type="button" onClick={() => { setOpen(false); window.setTimeout(() => setOpen(true), 0); }}>다시 시도</button></div>}
           <div className="postcode-embed" ref={embedRoot} />
-          <p className="postcode-provider"><span>K</span>Kakao 우편번호 서비스</p>
         </section>
       </div>}
     </>

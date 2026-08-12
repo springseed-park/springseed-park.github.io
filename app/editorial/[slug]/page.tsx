@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "../../components/StaticLink";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { editorials, getEditorial } from "../../lib/editorials";
 

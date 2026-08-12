@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "../components/StaticLink";
 import { Check, ChevronLeft, CreditCard, LockKeyhole, LogIn, PackageCheck, TicketPercent } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useStore } from "../components/StoreProvider";

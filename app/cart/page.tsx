@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "../components/StaticLink";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useStore } from "../components/StoreProvider";
 import { useAuth } from "../components/AuthProvider";

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "./StaticLink";
 import { Heart, Plus, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { formatPrice, Product } from "../lib/products";

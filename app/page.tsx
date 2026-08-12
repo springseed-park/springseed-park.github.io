@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "./components/StaticLink";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Pause, Play } from "lucide-react";
 import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
 import { HeroScene } from "./components/HeroScene";

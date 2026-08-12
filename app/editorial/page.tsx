@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "../components/StaticLink";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { ScrollParallaxImage } from "../components/ScrollParallaxImage";
 import { editorials } from "../lib/editorials";

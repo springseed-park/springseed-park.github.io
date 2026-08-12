@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import Link from "../../components/StaticLink";
 import { ChevronLeft, ChevronRight, CreditCard, Heart, ImagePlus, RotateCcw, ShoppingBag, Truck, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { ProductCard } from "../../components/ProductCard";
@@ -97,7 +96,6 @@ function ProductInformation({ product }: { product: Product }) {
 }
 
 export function ProductDetail({ product }: { product: Product }) {
-  const router = useRouter();
   const [size, setSize] = useState("");
   const [color, setColor] = useState(product.colors[0].name);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -165,7 +163,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const buyNow = () => {
     if (!size) { showToast("사이즈를 먼저 선택해 주세요."); return; }
     localStorage.setItem("elan-buy-now", JSON.stringify({ id: product.id, size, color, quantity: 1 }));
-    router.push("/checkout?mode=buy-now");
+    window.location.assign("/checkout?mode=buy-now");
   };
 
   const submitReview = (event: FormEvent<HTMLFormElement>) => {

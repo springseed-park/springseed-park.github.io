@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "../components/StaticLink";
 import { Heart } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { useStore } from "../components/StoreProvider";

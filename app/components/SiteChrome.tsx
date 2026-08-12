@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "./StaticLink";
 import { usePathname } from "next/navigation";
 import { Heart, Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
